@@ -1,16 +1,20 @@
 <script setup>
 const links = [{
-  label: 'Features',
-  to: '#features',
-  exactHash: true
+  label: 'Homepage',
+  to: 'https://jpprofessionals.de/:',
+  target: '_blank'
 }, {
-  label: 'Documentation',
-  to: 'https://ui.nuxt.com/pro',
+  label: 'Impressum',
+  to: 'https://jpprofessionals.de/impressum',
+  target: '_blank'
+}, {
+  label: 'Datenschutz',
+  to: 'https://jpprofessionals.de/privacy-policy',
   target: '_blank'
 }]
 
 useHead({
-  title: 'Nuxt UI Pro - Starter',
+  title: 'Domain Checker',
   meta: [
     { name: 'viewport', content: 'width=device-width, initial-scale=1' }
   ],
@@ -30,13 +34,13 @@ useSeoMeta({
 <template>
   <UHeader :links="links">
     <template #logo>
-      Nuxt UI Pro <UBadge label="Starter" variant="subtle" class="mb-0.5" />
+      <p>Domain Checker <UBadge label="Open Soruce" variant="subtle" class="mb-0.5" /></p>
     </template>
 
     <template #right>
       <UColorModeButton />
 
-      <UButton to="https://github.com/nuxt-ui-pro/starter" target="_blank" icon="i-simple-icons-github" aria-label="GitHub" color="gray" variant="ghost" />
+      <UButton to="https://github.com/jpprofessionals/domain-checker" target="_blank" icon="i-simple-icons-github" aria-label="GitHub" color="gray" variant="ghost" />
     </template>
   </UHeader>
 
@@ -45,8 +49,8 @@ useSeoMeta({
   </UMain>
 
   <UFooter>
-    <template #left>
-      Copyright © {{ new Date().getFullYear() }}
+    <template #center>
+      <p>Copyright © {{ new Date().getFullYear() }}</p>
     </template>
   </UFooter>
 </template>
