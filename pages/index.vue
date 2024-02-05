@@ -1,40 +1,96 @@
+<script setup lang="ts">
+import { ref, reactive } from 'vue'
+import { z } from 'zod'
+import { useFetch } from '#imports'
+import type { DomainResult } from '../types/domain'
+
+const schema = z.object({
+  search: z.string().min(3, 'Must be at least 3 characters').nonempty('Required'),
+})
+
+type FormData = z.infer<typeof schema>;
+
+const state = reactive<FormData>({
+  search: '',
+})
+
+const searchQuery = ref('')
+const domainResults: Ref<DomainResult[]> = ref([])
+const error = ref('')
+
+const checkDomains = async () => {
+  const { data, error: fetchError } = await useFetch(`/api/checkDomains?domain=${searchQuery.value}`)
+  
+  if (fetchError.value) {
+    error.value = 'Failed to check domain availability.'
+    return
+  }
+
+  if (data.value) {
+    domainResults.value = data.value as DomainResult[]
+  }
+}
+
+const onSubmit = () => {
+  checkDomains() // Call the function to check domain availability
+}
+</script>
+
 <template>
   <div>
-    <ULandingHero title="Nuxt UI Pro - Starter" description="Nuxt UI Pro is a collection of premium components built on top of Nuxt UI to create beautiful & responsive Nuxt applications in minutes.">
+    <ULandingHero
+      title="JPP - Domain Checker"
+      description="Check if your desired Domain is available in seconds."
+    >
       <template #links>
-        <UButton to="https://ui.nuxt.com/pro/guide" target="_blank" size="lg" icon="i-heroicons-book-open">
-          Guide
+        <UButton
+          to="#check"
+          size="lg"
+          icon="i-material-symbols:domain-verification"
+        >
+          Check Domain
         </UButton>
-
-        <UButton to="https://ui.nuxt.com/pro/components" target="_blank" size="lg" color="gray" icon="i-heroicons-cube-transparent">
-          Components
+        <UButton
+          to="https://github.com/jpprfoessionals/"
+          target="_blank"
+          size="lg"
+          color="gray"
+          icon="i-heroicons-cube-transparent"
+        >
+          Open Source Repository
         </UButton>
       </template>
     </ULandingHero>
 
-    <ULandingSection id="features" title="The freedom to build anything">
+    <ULandingSection
+      id="features"
+      title="Search & Check"
+      class="py-0 pb-0 pt-0 mb-0"
+    >
       <template #description>
-        Nuxt UI Pro ships with an extensive set of advanced components that cover a wide range of use-cases.<br> Carefully crafted to reduce boilerplate code without sacrificing flexibility.
+        Enter Your Desired Domain and we will check if it's available or used.
       </template>
 
-      <UPageGrid>
-        <UPageCard icon="i-heroicons-wrench-screwdriver" title="Fully customizable" description="Like Nuxt UI, change the style of any component from your App Config or customize them specifically through the ui prop." />
-        <UPageCard icon="i-heroicons-square-3-stack-3d" title="Slots for everything" description="Each component leverages the power of Vue's slots to give you the flexibility to build anything." />
-        <UPageCard icon="i-heroicons-device-phone-mobile" title="Responsive by design" description="Nuxt UI Pro components aims to structure your content, they are responsive by design and will adapt to any screen size." />
-      </UPageGrid>
+      <UForm :state="state" class="pb-0" @submit.prevent="onSubmit">
+        <UFormGroup name="domain-search">
+          <UInput
+            v-model="state.search"
+            name="search"
+            color="primary"
+            variant="outline"
+            placeholder="Search Domains..."
+          />
+          <UButton type="button" @click="onSubmit">
+            Check
+          </UButton>
+        </UFormGroup>
+      </UForm>
     </ULandingSection>
 
-    <ULandingSection>
-      <ULandingCTA title="Ready to get started?" description="Nuxt UI Pro is free in development, but you need a license to use it in production.">
-        <template #links>
-          <UButton to="https://ui.nuxt.com/pro/purchase" target="_blank" size="lg" color="black" icon="i-heroicons-credit-card">
-            Buy now
-          </UButton>
-          <UButton to="https://ui.nuxt.com/pro/guide#license" target="_blank" size="lg" color="gray" trailing-icon="i-heroicons-arrow-right-20-solid">
-            License
-          </UButton>
-        </template>
-      </ULandingCTA>
+    <ULandingSection id="results" class="mt-0 py-0 pb-0 pt-0">
+      <div v-for="result in domainResults" :key="result.id">
+        <p>{{ result.name }} - {{ result.available }}</p>
+      </div>
     </ULandingSection>
   </div>
 </template>
