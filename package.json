@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@iconify-json/heroicons": "^1.1.19",
+    "@iconify-json/material-symbols": "^1.1.72",
     "@iconify-json/simple-icons": "^1.1.90",
     "@nuxt/ui-pro": "^0.7.5",
     "axios": "^1.6.7",

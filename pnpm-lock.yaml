@@ -11,6 +11,9 @@ dependencies:
   '@iconify-json/heroicons':
     specifier: ^1.1.19
     version: 1.1.19
+  '@iconify-json/material-symbols':
+    specifier: ^1.1.72
+    version: 1.1.72
   '@iconify-json/simple-icons':
     specifier: ^1.1.90
     version: 1.1.90
@@ -868,6 +871,12 @@ packages:
 
   /@iconify-json/heroicons@1.1.19:
     resolution: {integrity: sha512-uW2F9vdGll59W21ocBl+wR4Ve+/1CsmzBqPTuOaR3CbKzqnJKwzGASvC4Op0uTieFVWfBaevnzcRxwNo73J29g==}
+    dependencies:
+      '@iconify/types': 2.0.0
+    dev: false
+
+  /@iconify-json/material-symbols@1.1.72:
+    resolution: {integrity: sha512-5IRqdI4HSbdatHBn6NZG+O9M1pJA39IrUhoBD824dXkKKE/3OmS2aU16w1hAhnr7n/euBqclkXAeUG3rDs0l1A==}
     dependencies:
       '@iconify/types': 2.0.0
     dev: false
