@@ -2,16 +2,16 @@
 const links = [
   {
     label: 'Homepage',
-    to: 'https://jpprofessionals.de/:',
+    to: 'https://jpprofessionals.de/',
     target: '_blank',
   },
   {
-    label: 'Impressum',
+    label: 'Imprint',
     to: 'https://jpprofessionals.de/impressum',
     target: '_blank',
   },
   {
-    label: 'Datenschutz',
+    label: 'Privacy Policy',
     to: 'https://jpprofessionals.de/privacy-policy',
     target: '_blank',
   },
@@ -28,7 +28,7 @@ useHead({
 
 useSeoMeta({
   description:
-    'This Domain checker is an open soruce project a collection of premium components built on top of Nuxt UI to create beautiful & responsive Nuxt applications in minutes.',
+    'This Domain checker is an open source project where you can check if a domain already in use or available to buy.',
 })
 </script>
 
