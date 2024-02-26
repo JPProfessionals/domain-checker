@@ -1,7 +1,7 @@
 <script setup>
 const { t } = useI18n()
 
-const links = [
+const links = computed(() => [
   {
     label: t('global.homepage', { returnObjects: true }),
     to: 'https://jpprofessionals.de/',
@@ -17,7 +17,7 @@ const links = [
     to: 'https://jpprofessionals.de/privacy-policy',
     target: '_blank',
   },
-]
+])
 
 useHead({
   title: t('global.seoTitle', { returnObjects: true }),
