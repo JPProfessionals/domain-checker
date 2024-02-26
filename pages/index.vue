@@ -1,40 +1,300 @@
-<template>
-  <div>
-    <ULandingHero title="Nuxt UI Pro - Starter" description="Nuxt UI Pro is a collection of premium components built on top of Nuxt UI to create beautiful & responsive Nuxt applications in minutes.">
-      <template #links>
-        <UButton to="https://ui.nuxt.com/pro/guide" target="_blank" size="lg" icon="i-heroicons-book-open">
-          Guide
-        </UButton>
+<script setup lang="ts">
+// 1. Imports
+import { ref, reactive } from 'vue'
+import { z } from 'zod'
+import { useFetch, useI18n } from '#imports'
+import type { FormSubmitEvent } from '#ui/types'
+import type { DomainResult, DomainsResult } from '../types/domain'
 
-        <UButton to="https://ui.nuxt.com/pro/components" target="_blank" size="lg" color="gray" icon="i-heroicons-cube-transparent">
-          Components
+// 2. Reactive States and Refs
+const { t } = useI18n()
+const domainsResults: Ref<DomainsResult> = ref({ domains: [] as DomainResult[] })
+const error = ref('')
+const loading = ref(false)
+const isOpen = ref(false)
+const currentLink = ref('')
+
+const defaultTLDs = ['.com', '.net', '.org', '.de']
+let TLDs = [] as string[]
+const formState = reactive({
+  search: '',
+  selectedTLDs: [...defaultTLDs], // Use a spread to ensure reactivity is maintained
+})
+
+// 3. Validation Schema
+const schema = z.object({
+  search: z
+    .string()
+    .min(3, t('schema.searchMin', { returnObjects: true }))
+    .regex(
+      /^[a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?$/,
+      t('schema.searchRegex', { returnObjects: true })
+    ),
+})
+
+// 4. Lifecycle Hooks
+onNuxtReady(async () => {
+  await fetchTLDs()
+})
+
+// 5. Methods
+async function fetchTLDs() {
+  const { data, error: fetchError } = await useFetch('/api/getTlds')
+  if (fetchError.value || !data.value || data.value.length === 0) {
+    console.error('Failed to fetch TLDs, using default TLDs:', fetchError.value)
+    TLDs = defaultTLDs
+  } else {
+    const fetchedTLDs = data.value
+      .map((tld: string) => (tld.startsWith('.') ? tld : `.${tld}`))
+      .filter((tld: string) => !defaultTLDs.includes(tld))
+    TLDs = [...defaultTLDs, ...fetchedTLDs]
+    formState.selectedTLDs = [...defaultTLDs]
+  }
+}
+
+async function checkDomains() {
+  loading.value = true
+  const requestBody = {
+    domain: formState.search,
+    tlds: formState.selectedTLDs,
+  }
+  const { data, error: fetchError } = await useFetch('/api/checkDomains', {
+    method: 'post',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(requestBody),
+  })
+  if (fetchError.value) {
+    console.log('fetchError', fetchError)
+    error.value = t('notifications.generalError', { returnObjects: true })
+    loading.value = false
+    return
+  }
+  if (data.value) {
+    domainsResults.value = data.value as DomainsResult
+  }
+  loading.value = false
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function onSubmit(_event: FormSubmitEvent<z.output<typeof schema>>) {
+  await checkDomains()
+}
+
+function openLinkModal(domain: string) {
+  currentLink.value = 'https://' + domain
+  isOpen.value = true
+}
+</script>
+
+
+<template>
+  <div class="mb-6">
+    <ULandingHero
+      :title="$t('header.title', { returnObjects: true })"
+      :description="$t('header.subtitle', { returnObjects: true })"
+    >
+      <template #links>
+        <UButton
+          to="#check"
+          size="lg"
+          icon="i-material-symbols-domain-verification"
+        >
+          {{ $t('header.checkDomain', { returnObjects: true }) }}
+        </UButton>
+        <UButton
+          to="https://github.com/jpprofessionals/domain-checker"
+          target="_blank"
+          size="lg"
+          color="gray"
+          icon="i-heroicons-cube-transparent"
+        >
+          {{ $t('header.openSourceRepo', { returnObjects: true }) }}
         </UButton>
       </template>
     </ULandingHero>
 
-    <ULandingSection id="features" title="The freedom to build anything">
-      <template #description>
-        Nuxt UI Pro ships with an extensive set of advanced components that cover a wide range of use-cases.<br> Carefully crafted to reduce boilerplate code without sacrificing flexibility.
-      </template>
+    <UContainer id="search">
+      <UPageHeader
+        :headline="$t('search.headline', { returnObjects: true })"
+        :title="$t('search.title', { returnObjects: true })"
+        :description="$t('search.description', { returnObjects: true })"
+        class="pb-4 pt-0"
+      >
+        <UForm
+          id="check"
+          :state="formState"
+          :schema="schema"
+          class="mt-6"
+          @submit="onSubmit"
+        >
+          <div class="flex flex-wrap -mx-3">
+            <div class="w-full sm:w-3/4 px-3">
+              <UFormGroup
+                :label="$t('search.form.inputLabel', { returnObjects: true })"
+                name="domain-search"
+                class="mb-6"
+              >
+                <UInput
+                  v-model="formState.search"
+                  name="search"
+                  :loading="loading"
+                  :disabled="loading"
+                  color="primary"
+                  variant="outline"
+                  size="xl"
+                  :placeholder="
+                    $t('search.form.inputPlaceholder', {
+                      returnObjects: true,
+                    })
+                  "
+                  :autofocus="true"
+                  :required="true"
+                  :ui="{ icon: { trailing: { pointer: '' } } }"
+                >
+                  <template #trailing>
+                    <UButton
+                      :padded="false"
+                      variant="link"
+                      icon="i-heroicons-magnifying-glass-solid"
+                      type="submit"
+                    />
+                  </template>
+                </UInput>
+              </UFormGroup>
+            </div>
+            <div class="w-full sm:w-1/4 px-3">
+              <UFormGroup
+                :label="
+                  $t('search.form.selectLabel', {
+                    returnObjects: true,
+                  })
+                "
+                name="tlds"
+                class="mb-6"
+              >
+                <USelectMenu
+                  v-model="formState.selectedTLDs"
+                  size="xl"
+                  :options="TLDs"
+                  multiple
+                  :required="true"
+                  :placeholder="
+                    $t('search.form.selectPlaceholder', {
+                      returnObjects: true,
+                    })
+                  "
+                  :searchable="true"
+                  :searchable-placeholder="
+                    $t('search.form.selectSearchablePlaceholder', {
+                      returnObjects: true,
+                    })
+                  "
+                />
+              </UFormGroup>
+            </div>
+          </div>
+        </UForm>
+      </UPageHeader>
 
-      <UPageGrid>
-        <UPageCard icon="i-heroicons-wrench-screwdriver" title="Fully customizable" description="Like Nuxt UI, change the style of any component from your App Config or customize them specifically through the ui prop." />
-        <UPageCard icon="i-heroicons-square-3-stack-3d" title="Slots for everything" description="Each component leverages the power of Vue's slots to give you the flexibility to build anything." />
-        <UPageCard icon="i-heroicons-device-phone-mobile" title="Responsive by design" description="Nuxt UI Pro components aims to structure your content, they are responsive by design and will adapt to any screen size." />
-      </UPageGrid>
-    </ULandingSection>
+      <div v-if="error.length != 0" class="mt-4">
+        <ULandingCard
+          title="Error"
+          description="Something went wrong, please try again later."
+          color="red"
+          icon="i-heroicons-exclamation-circle"
+          :ui="{
+            icon: {
+              wrapper: 'mb-2 flex',
+              base: 'w-10 h-10 flex-shrink-0 text-red-500 dark:text-red-500',
+            },
+          }"
+        />
+      </div>
 
-    <ULandingSection>
-      <ULandingCTA title="Ready to get started?" description="Nuxt UI Pro is free in development, but you need a license to use it in production.">
-        <template #links>
-          <UButton to="https://ui.nuxt.com/pro/purchase" target="_blank" size="lg" color="black" icon="i-heroicons-credit-card">
-            Buy now
-          </UButton>
-          <UButton to="https://ui.nuxt.com/pro/guide#license" target="_blank" size="lg" color="gray" trailing-icon="i-heroicons-arrow-right-20-solid">
-            License
-          </UButton>
+      <div d="resultCards" class="grid grid-cols-2 gap-4 mt-8">
+        <ULandingCard
+          v-for="result in domainsResults.domains"
+          :key="result.id"
+          :title="result.domain"
+          :icon="
+            result.available
+              ? 'i-heroicons-lock-open'
+              : 'i-heroicons-lock-closed'
+          "
+          :ui="
+            result.available
+              ? {
+                icon: {
+                  wrapper: 'mb-2 flex',
+                  base: 'w-10 h-10 flex-shrink-0 text-green-500 dark:text-green-500',
+                },
+              }
+              : {
+                icon: {
+                  wrapper: 'mb-2 flex',
+                  base: 'w-10 h-10 flex-shrink-0 text-red-500 dark:text-red-500',
+                },
+              }
+          "
+          :description="
+            result.available
+              ? $t('result.domainAvailable', { returnObjects: true })
+              : $t('result.domainUsed', { returnObjects: true })
+          "
+          :to="!result.available ? 'OpenModal' : null"
+          target="_blank"
+          @click.prevent.stop="
+            !result.available ? openLinkModal(result.domain) : null
+          "
+        />
+      </div>
+    </UContainer>
+
+    <UModal v-model="isOpen">
+      <UCard
+        :ui="{
+          ring: '',
+          divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+        }"
+      >
+        <template #header>
+          <div class="flex items-center justify-between">
+            <h3
+              class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
+            >
+              {{ $t('modal.headline', { returnObjects: true }) }}
+            </h3>
+            <UButton
+              color="gray"
+              variant="ghost"
+              icon="i-heroicons-x-mark-20-solid"
+              class="-my-1"
+              @click="isOpen = false"
+            />
+          </div>
         </template>
-      </ULandingCTA>
-    </ULandingSection>
+        <UPageCard
+          :title="$t('modal.title', { returnObjects: true })"
+          :description="$t('modal.subTitle', { returnObjects: true })"
+          icon="i-heroicons-exclamation-triangle"
+          class="mb-4"
+          :ui="{
+            icon: {
+              wrapper: 'mb-2 flex',
+              base: 'w-10 h-10 flex-shrink-0 text-orange-500',
+            },
+          }"
+        />
+
+        <UButton
+          block
+          :label="$t('modal.button', { returnObjects: true })"
+          icon="i-heroicons-link"
+          :to="currentLink"
+          target="_blank"
+          color="blue"
+        />
+      </UCard>
+    </UModal>
   </div>
 </template>
