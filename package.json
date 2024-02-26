@@ -21,7 +21,7 @@
     "@vercel/analytics": "^1.2.2",
     "axios": "^1.6.7",
     "h3": "^1.10.1",
-    "nuxt": "^3.10.0"
+    "nuxt": "^3.10.3"
   },
   "devDependencies": {
     "@nuxt/eslint-config": "^0.2.0",
