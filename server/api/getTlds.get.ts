@@ -15,7 +15,6 @@ export default defineEventHandler(async () => {
     // Fetching the list of TLDs from GoDaddy's API
     const response = await axios.get(url, config)
     const tlds = response.data.map((tld: any) => tld.name)
-    console.log('Fetched TLDs:', tlds)
     return tlds // Returning the list of TLDs
   } catch (error) {
     console.error('Error fetching TLDs from GoDaddy:', error)
