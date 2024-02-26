@@ -26,8 +26,7 @@ useHead({
 })
 
 useSeoMeta({
-  description:
-  t('global.seoDescription', { returnObjects: true }),
+  description: t('global.seoDescription', { returnObjects: true }),
 })
 
 const { locale, locales } = useI18n()
@@ -43,7 +42,7 @@ const availableLocales = computed(() => {
     <template #logo>
       <p>
         Domain Checker
-        <UBadge label="Open Soruce" variant="subtle" class="mb-0.5" />
+        <UBadge label="Open Source" variant="subtle" class="mb-0.5" />
       </p>
     </template>
 
@@ -53,10 +52,13 @@ const availableLocales = computed(() => {
         :key="localeLang.code"
         color="gray"
         variant="ghost"
-        :trailing-icon="'i-circle-flags-' + localeLang.code"
         :to="switchLocalePath(localeLang.code)"
         :label="localeLang.name"
-      />
+      >
+        <template #trailing>
+          <UIcon :name="'i-circle-flags-' + localeLang.code" dynamic />
+        </template>
+      </UButton>
       <UColorModeButton />
 
       <UButton
