@@ -6,8 +6,8 @@ export interface DomainResult {
   currency: string,
   definitive: boolean,
   domain: string,
-  period: int,
-  price: int
+  period: number,
+  price: number
 }
 
 export interface DomainsResult{

@@ -1,34 +1,40 @@
 <script setup>
+const { t } = useI18n()
+
 const links = [
   {
-    label: 'Homepage',
+    label: t('global.homepage', { returnObjects: true }),
     to: 'https://jpprofessionals.de/',
     target: '_blank',
   },
   {
-    label: 'Imprint',
+    label: t('global.imprint', { returnObjects: true }),
     to: 'https://jpprofessionals.de/impressum',
     target: '_blank',
   },
   {
-    label: 'Privacy Policy',
+    label: t('global.privacyPolicy', { returnObjects: true }),
     to: 'https://jpprofessionals.de/privacy-policy',
     target: '_blank',
   },
 ]
 
 useHead({
-  title: 'Domain Checker',
+  title: t('global.seoTitle', { returnObjects: true }),
   meta: [{ name: 'viewport', content: 'width=device-width, initial-scale=1' }],
   link: [{ rel: 'icon', href: '/favicon.ico' }],
-  htmlAttrs: {
-    lang: 'en',
-  },
 })
 
 useSeoMeta({
   description:
-    'This Domain checker is an open source project where you can check if a domain already in use or available to buy.',
+  t('global.seoDescription', { returnObjects: true }),
+})
+
+const { locale, locales } = useI18n()
+const switchLocalePath = useSwitchLocalePath()
+
+const availableLocales = computed(() => {
+  return locales.value.filter((i) => i.code !== locale.value)
 })
 </script>
 
@@ -42,6 +48,15 @@ useSeoMeta({
     </template>
 
     <template #right>
+      <UButton
+        v-for="localeLang in availableLocales"
+        :key="localeLang.code"
+        color="gray"
+        variant="ghost"
+        :trailing-icon="'i-circle-flags-' + localeLang.code"
+        :to="switchLocalePath(localeLang.code)"
+        :label="localeLang.name"
+      />
       <UColorModeButton />
 
       <UButton
@@ -57,6 +72,7 @@ useSeoMeta({
 
   <UMain>
     <NuxtPage />
+    <UNotifications />
   </UMain>
 
   <UFooter>
