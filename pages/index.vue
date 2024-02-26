@@ -1,73 +1,97 @@
 <script setup lang="ts">
+// 1. Imports
 import { ref, reactive } from 'vue'
 import { z } from 'zod'
-import { useFetch } from '#imports'
+import { useFetch, useI18n } from '#imports'
 import type { FormSubmitEvent } from '#ui/types'
 import type { DomainResult, DomainsResult } from '../types/domain'
 
-const TLDs = ['.com', '.net', '.org', '.de', '.uk', '.fr', '.it', '.tv', '.co', '.eu', '.info', '.biz', '.co.uk', '.us', '.ca']
-
-const domainsResults: Ref<DomainsResult> = ref({
-  domains: [] as DomainResult[],
-})
+// 2. Reactive States and Refs
+const { t } = useI18n()
+const domainsResults: Ref<DomainsResult> = ref({ domains: [] as DomainResult[] })
 const error = ref('')
 const loading = ref(false)
-
-const checkDomains = async () => {
-  const { data, error: fetchError } = await useFetch(
-    `/api/checkDomains?domain=${formState.search}`
-  )
-
-  if (fetchError.value) {
-    console.log('ERROR')
-    error.value = 'Failed to check domain availability, please try again later.'
-    loading.value = false
-    return
-  }
-
-  if (data.value) {
-    domainsResults.value = data.value as DomainsResult
-
-    console.log(domainsResults)
-  }
-}
-
-const schema = z.object({
-  search: z
-    .string()
-    .min(3, 'Must be at least 3 characters long')
-    .regex(/^[a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?$/, 'Must be a valid domain name without TLD')
-})
-
-const formState = reactive({
-  search: '',
-  selectedTLDs: ref(TLDs.slice(0, 4))
-})
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function onSubmit (event: FormSubmitEvent<z.output<typeof schema>>) {
-  loading.value = true
-
-  console.log(event.data)
-  await checkDomains()
-  loading.value = false
-}
-
-
 const isOpen = ref(false)
 const currentLink = ref('')
 
-const openLinkModal = (domain: string) => {
+const defaultTLDs = ['.com', '.net', '.org', '.de']
+let TLDs = [] as string[]
+const formState = reactive({
+  search: '',
+  selectedTLDs: [...defaultTLDs], // Use a spread to ensure reactivity is maintained
+})
+
+// 3. Validation Schema
+const schema = z.object({
+  search: z
+    .string()
+    .min(3, t('schema.searchMin', { returnObjects: true }))
+    .regex(
+      /^[a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?$/,
+      t('schema.searchRegex', { returnObjects: true })
+    ),
+})
+
+// 4. Lifecycle Hooks
+onNuxtReady(async () => {
+  await fetchTLDs()
+})
+
+// 5. Methods
+async function fetchTLDs() {
+  const { data, error: fetchError } = await useFetch('/api/getTlds')
+  if (fetchError.value || !data.value || data.value.length === 0) {
+    console.error('Failed to fetch TLDs, using default TLDs:', fetchError.value)
+    TLDs = defaultTLDs
+  } else {
+    const fetchedTLDs = data.value
+      .map((tld: string) => (tld.startsWith('.') ? tld : `.${tld}`))
+      .filter((tld: string) => !defaultTLDs.includes(tld))
+    TLDs = [...defaultTLDs, ...fetchedTLDs]
+    formState.selectedTLDs = [...defaultTLDs]
+  }
+}
+
+async function checkDomains() {
+  loading.value = true
+  const requestBody = {
+    domain: formState.search,
+    tlds: formState.selectedTLDs,
+  }
+  const { data, error: fetchError } = await useFetch('/api/checkDomains', {
+    method: 'post',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(requestBody),
+  })
+  if (fetchError.value) {
+    console.log('fetchError', fetchError)
+    error.value = t('notifications.generalError', { returnObjects: true })
+    loading.value = false
+    return
+  }
+  if (data.value) {
+    domainsResults.value = data.value as DomainsResult
+  }
+  loading.value = false
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function onSubmit(_event: FormSubmitEvent<z.output<typeof schema>>) {
+  await checkDomains()
+}
+
+function openLinkModal(domain: string) {
   currentLink.value = 'https://' + domain
   isOpen.value = true
 }
 </script>
 
+
 <template>
   <div class="mb-6">
     <ULandingHero
-      title="JPP's Domain Checker"
-      description="Check if your desired Domain is available in seconds without Ads."
+      :title="$t('header.title', { returnObjects: true })"
+      :description="$t('header.subtitle', { returnObjects: true })"
     >
       <template #links>
         <UButton
@@ -75,7 +99,7 @@ const openLinkModal = (domain: string) => {
           size="lg"
           icon="i-material-symbols-domain-verification"
         >
-          Check Domain
+          {{ $t('header.checkDomain', { returnObjects: true }) }}
         </UButton>
         <UButton
           to="https://github.com/jpprofessionals/domain-checker"
@@ -84,22 +108,32 @@ const openLinkModal = (domain: string) => {
           color="gray"
           icon="i-heroicons-cube-transparent"
         >
-          Open Source Repository
+          {{ $t('header.openSoruceRepo', { returnObjects: true }) }}
         </UButton>
       </template>
     </ULandingHero>
 
-    <UContainer id="results">
+    <UContainer id="search">
       <UPageHeader
-        headline="Search & Check"
-        title="Domain Results"
-        description="Enter your desired domain and we will check whether it is available or already taken."
+        :headline="$t('search.headline', { returnObjects: true })"
+        :title="$t('search.title', { returnObjects: true })"
+        :description="$t('search.description', { returnObjects: true })"
         class="pb-4 pt-0"
       >
-        <UForm id="check" :state="formState" :schema="schema" class="mt-6" @submit="onSubmit">
+        <UForm
+          id="check"
+          :state="formState"
+          :schema="schema"
+          class="mt-6"
+          @submit="onSubmit"
+        >
           <div class="flex flex-wrap -mx-3">
             <div class="w-full sm:w-3/4 px-3">
-              <UFormGroup label="Domain Name" name="domain-search" class="mb-6">
+              <UFormGroup
+                :label="$t('search.form.inputLabel', { returnObjects: true })"
+                name="domain-search"
+                class="mb-6"
+              >
                 <UInput
                   v-model="formState.search"
                   name="search"
@@ -108,7 +142,11 @@ const openLinkModal = (domain: string) => {
                   color="primary"
                   variant="outline"
                   size="xl"
-                  placeholder="Search Domains..."
+                  :placeholder="
+                    $t('search.form.inputPlaceholder', {
+                      returnObjects: true,
+                    })
+                  "
                   :autofocus="true"
                   :required="true"
                   :ui="{ icon: { trailing: { pointer: '' } } }"
@@ -125,16 +163,52 @@ const openLinkModal = (domain: string) => {
               </UFormGroup>
             </div>
             <div class="w-full sm:w-1/4 px-3">
-              <UFormGroup label="TLDs" name="tlds" class="mb-6">
-                <USelectMenu v-model="formState.selectedTLDs" size="xl" :options="TLDs" multiple placeholder="Select TLDs" :searchable="true" />
+              <UFormGroup
+                :label="
+                  $t('search.form.selectLabel', {
+                    returnObjects: true,
+                  })
+                "
+                name="tlds"
+                class="mb-6"
+              >
+                <USelectMenu
+                  v-model="formState.selectedTLDs"
+                  size="xl"
+                  :options="TLDs"
+                  multiple
+                  :required="true"
+                  :placeholder="
+                    $t('search.form.selectPlaceholder', {
+                      returnObjects: true,
+                    })
+                  "
+                  :searchable="true"
+                  :searchable-placeholder="
+                    $t('search.form.selectSearchablePlaceholder', {
+                      returnObjects: true,
+                    })
+                  "
+                />
               </UFormGroup>
             </div>
           </div>
         </UForm>
       </UPageHeader>
 
-      <div v-if="error.length != 0" class="m-4">
-        <ULandingCard title="Error" color="red" icon="i-heroicons-exclamation-circle" />
+      <div v-if="error.length != 0" class="mt-4">
+        <ULandingCard
+          title="Error"
+          description="Something went wrong, please try again later."
+          color="red"
+          icon="i-heroicons-exclamation-circle"
+          :ui="{
+            icon: {
+              wrapper: 'mb-2 flex',
+              base: 'w-10 h-10 flex-shrink-0 text-red-500 dark:text-red-500',
+            },
+          }"
+        />
       </div>
 
       <div d="resultCards" class="grid grid-cols-2 gap-4 mt-8">
@@ -152,20 +226,20 @@ const openLinkModal = (domain: string) => {
               ? {
                 icon: {
                   wrapper: 'mb-2 flex',
-                  base: 'w-10 h-10 flex-shrink-0 text-green-500',
+                  base: 'w-10 h-10 flex-shrink-0 text-green-500 dark:text-green-500',
                 },
               }
               : {
                 icon: {
                   wrapper: 'mb-2 flex',
-                  base: 'w-10 h-10 flex-shrink-0 text-red-500',
+                  base: 'w-10 h-10 flex-shrink-0 text-red-500 dark:text-red-500',
                 },
               }
           "
           :description="
             result.available
-              ? 'This Domain is available.'
-              : 'This Domain is used and/or not available!'
+              ? $t('result.domainAvailable', { returnObjects: true })
+              : $t('result.domainUsed', { returnObjects: true })
           "
           :to="!result.available ? 'OpenModal' : null"
           target="_blank"
@@ -175,6 +249,7 @@ const openLinkModal = (domain: string) => {
         />
       </div>
     </UContainer>
+
     <UModal v-model="isOpen">
       <UCard
         :ui="{
@@ -187,7 +262,7 @@ const openLinkModal = (domain: string) => {
             <h3
               class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
             >
-              Redirect away?
+              {{ $t('modal.headline', { returnObjects: true }) }}
             </h3>
             <UButton
               color="gray"
@@ -199,8 +274,8 @@ const openLinkModal = (domain: string) => {
           </div>
         </template>
         <UPageCard
-          title="External URL"
-          description="You're leaving this Site to an external Domain!"
+          :title="$t('modal.title', { returnObjects: true })"
+          :description="$t('modal.subTitle', { returnObjects: true })"
           icon="i-heroicons-exclamation-triangle"
           class="mb-4"
           :ui="{
@@ -213,7 +288,7 @@ const openLinkModal = (domain: string) => {
 
         <UButton
           block
-          label="I understand, please redirect me"
+          :label="$t('modal.button', { returnObjects: true })"
           icon="i-heroicons-link"
           :to="currentLink"
           target="_blank"
