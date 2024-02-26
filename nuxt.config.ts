@@ -9,7 +9,7 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
     '@nuxthq/studio',
     '@nuxt/content',
-    '@nuxtjs/eslint-module'
+    '@nuxtjs/eslint-module',
   ],
   site: {
     url: 'https://domain.jpprofessionals.de',
@@ -28,12 +28,12 @@ export default defineNuxtConfig({
     locales: [
       {
         code: 'en',
-        name: 'English'
+        name: 'English',
       },
       {
         code: 'de',
-        name: 'Deutsch'
-      }
+        name: 'Deutsch',
+      },
     ],
     defaultLocale: 'en',
   },
@@ -42,9 +42,15 @@ export default defineNuxtConfig({
       crossOriginEmbedderPolicy:
         process.env.NODE_ENV === 'development' ? 'unsafe-none' : 'require-corp',
     },
-    rateLimiter: {
-      tokensPerInterval: process.env.NODE_ENV === 'development' ? 100 : 5,
-      interval: 10000,
+  },
+  routeRules: {
+    '/api/*': {
+      security: {
+        rateLimiter: {
+          tokensPerInterval: process.env.NODE_ENV === 'development' ? 100 : 5,
+          interval: 10000,
+        },
+      },
     },
   },
 })
