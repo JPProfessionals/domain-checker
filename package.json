@@ -17,7 +17,7 @@
     "@iconify-json/material-symbols": "^1.1.72",
     "@iconify-json/simple-icons": "^1.1.90",
     "@nuxt/content": "^2.12.0",
-    "@nuxt/ui-pro": "^0.7.5",
+    "@nuxt/ui-pro": "^1.0.1",
     "@vercel/analytics": "^1.2.2",
     "axios": "^1.6.7",
     "h3": "^1.10.1",
