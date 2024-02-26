@@ -108,7 +108,7 @@ function openLinkModal(domain: string) {
           color="gray"
           icon="i-heroicons-cube-transparent"
         >
-          {{ $t('header.openSoruceRepo', { returnObjects: true }) }}
+          {{ $t('header.openSourceRepo', { returnObjects: true }) }}
         </UButton>
       </template>
     </ULandingHero>

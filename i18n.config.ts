@@ -69,7 +69,7 @@ export default defineI18nConfig(() => ({
             'Überprüfe, ob deine gewünschte Domain in Sekunden verfügbar ist, ohne Werbung.',
       
           checkDomain: 'Domain überprüfen',
-          openSoruceRepo: 'Open-Source-Repository',
+          openSourceRepo: 'Open-Source-Repository',
         },
         search: {
           headline: 'Suchen & Überprüfen',
