@@ -10,11 +10,11 @@ export default defineEventHandler(async (event) => {
   const tlds = body.tlds ? body.tlds : ['.com', '.net', '.org', '.de'] // Default TLDs if none are provided
 
   if (!baseDomain) {
-    return { error: 'No base domain provided', statusCode: 400 }
+    throw createError({ statusMessage: 'No base domain provided', statusCode: 400 })
   }
 
   if (!Array.isArray(tlds) || tlds.some(tld => typeof tld !== 'string')) {
-    return { error: 'Invalid TLDs format', statusCode: 400 }
+    throw createError({ statusMessage: 'Invalid TLDs format', statusCode: 400 })
   }
 
   try {
@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
     return result
   } catch (error) {
     console.error('Error checking domain availability:', error)
-    return { error: 'Failed to check domain availability', statusCode: 500 }
+    throw createError({ statusMessage: 'Failed to check domain availability', statusCode: 500 })
   }
 })
 

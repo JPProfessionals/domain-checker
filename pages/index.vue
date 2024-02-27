@@ -43,13 +43,14 @@ async function fetchTLDs() {
   if (fetchError.value || !data.value || data.value.length === 0) {
     console.error('Failed to fetch TLDs, using default TLDs:', fetchError.value)
     TLDs = defaultTLDs
-  } else {
-    const fetchedTLDs = data.value
-      .map((tld: string) => (tld.startsWith('.') ? tld : `.${tld}`))
-      .filter((tld: string) => !defaultTLDs.includes(tld))
-    TLDs = [...defaultTLDs, ...fetchedTLDs]
-    formState.selectedTLDs = [...defaultTLDs]
+    return
   }
+  const fetchedTLDs = data.value
+    .map((tld: string) => (tld.startsWith('.') ? tld : `.${tld}`))
+    .filter((tld: string) => !defaultTLDs.includes(tld))
+  TLDs = [...defaultTLDs, ...fetchedTLDs]
+  formState.selectedTLDs = [...defaultTLDs]
+
 }
 
 async function checkDomains() {
@@ -131,7 +132,7 @@ function openLinkModal(domain: string) {
             <div class="w-full sm:w-3/4 px-3">
               <UFormGroup
                 :label="$t('search.form.inputLabel', { returnObjects: true })"
-                name="domain-search"
+                name="search"
                 class="mb-6"
               >
                 <UInput

@@ -40,9 +40,9 @@ const availableLocales = computed(() => {
 <template>
   <UHeader :links="links">
     <template #logo>
-      <p>
+      <p class="text-sm md:text-base">
         Domain Checker
-        <UBadge label="Open Source" variant="subtle" class="mb-0.5" />
+        <UBadge label="Open Source" variant="subtle" class="mb-0.5 block text-center" />
       </p>
     </template>
 
