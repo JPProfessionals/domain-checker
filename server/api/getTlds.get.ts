@@ -19,6 +19,6 @@ export default defineEventHandler(async () => {
   } catch (error) {
     console.error('Error fetching TLDs from GoDaddy:', error)
     // Returning an error response
-    return { error: 'Failed to fetch TLDs', statusCode: 500 }
+    throw createError({ statusMessage: 'Failed to fetch TLDs', statusCode: 500 })
   }
 })
