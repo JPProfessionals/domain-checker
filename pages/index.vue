@@ -8,14 +8,16 @@ import type { DomainResult, DomainsResult } from '../types/domain'
 
 // 2. Reactive States and Refs
 const { t } = useI18n()
-const domainsResults: Ref<DomainsResult> = ref({ domains: [] as DomainResult[] })
+const domainsResults: Ref<DomainsResult> = ref({
+  domains: [] as DomainResult[],
+})
 const error = ref('')
 const loading = ref(false)
 const isOpen = ref(false)
 const currentLink = ref('')
 
 const defaultTLDs = ['.com', '.net', '.org', '.de']
-let TLDs = [] as string[]
+let TLDs = [...defaultTLDs]
 const formState = reactive({
   search: '',
   selectedTLDs: [...defaultTLDs], // Use a spread to ensure reactivity is maintained
@@ -37,6 +39,8 @@ onNuxtReady(async () => {
   await fetchTLDs()
 })
 
+const fetchedTLDs = ref([] as string[])
+
 // 5. Methods
 async function fetchTLDs() {
   const { data, error: fetchError } = await useFetch('/api/getTlds')
@@ -45,12 +49,29 @@ async function fetchTLDs() {
     TLDs = defaultTLDs
     return
   }
-  const fetchedTLDs = data.value
+  fetchedTLDs.value = data.value
     .map((tld: string) => (tld.startsWith('.') ? tld : `.${tld}`))
     .filter((tld: string) => !defaultTLDs.includes(tld))
-  TLDs = [...defaultTLDs, ...fetchedTLDs]
+  TLDs = [...defaultTLDs, ...fetchedTLDs.value.slice(0, 50)]
   formState.selectedTLDs = [...defaultTLDs]
+}
 
+async function search(q: string) {
+  loading.value = true
+
+  if (fetchedTLDs.value.length == 0) {
+    await fetchTLDs()
+  }
+
+  let filteredTlds = [...defaultTLDs, ...fetchedTLDs.value.slice(0, 50)]
+
+  if (q.length != 0) {
+    filteredTlds = fetchedTLDs.value.filter((tld) => tld.includes(q))
+  }
+
+  loading.value = false
+
+  return filteredTlds
 }
 
 async function checkDomains() {
@@ -86,7 +107,6 @@ function openLinkModal(domain: string) {
   isOpen.value = true
 }
 </script>
-
 
 <template>
   <div class="mb-6">
@@ -166,7 +186,7 @@ function openLinkModal(domain: string) {
             <div class="w-full sm:w-1/4 px-3">
               <UFormGroup
                 :label="
-                  $t('search.form.selectLabel', {
+                  $t('search.form.selectMenuLabel', {
                     returnObjects: true,
                   })
                 "
@@ -180,17 +200,34 @@ function openLinkModal(domain: string) {
                   multiple
                   :required="true"
                   :placeholder="
-                    $t('search.form.selectPlaceholder', {
+                    $t('search.form.selectMenuPlaceholder', {
                       returnObjects: true,
                     })
                   "
-                  :searchable="true"
+                  :searchable="search"
                   :searchable-placeholder="
-                    $t('search.form.selectSearchablePlaceholder', {
+                    $t('search.form.selectMenuSearchablePlaceholder', {
                       returnObjects: true,
                     })
                   "
-                />
+                >
+                  <template #label>
+                    <template v-if="formState.selectedTLDs.length != 0">
+                      <span>{{ formState.selectedTLDs.length }}
+                        {{
+                          $t('search.form.selectMenuSelectedLabel', { returnObjects: true })
+                        }}</span>
+                    </template>
+                    <template v-else>
+                      <span class="text-gray-500 dark:text-gray-400 truncate">
+                        {{
+                          $t('search.form.selectMenuSelectedLabelEmpty', {
+                            returnObjects: true,
+                          })
+                        }}</span>
+                    </template>
+                  </template>
+                </USelectMenu>
               </UFormGroup>
             </div>
           </div>
