@@ -26,10 +26,11 @@ export default defineI18nConfig(() => ({
         form: {
           inputLabel: 'Domain Name',
           inputPlaceholder: 'Search Domains...',
-          selectLabel: 'TLDs',
-          selectPlaceholder: 'Select TLDs',
-          selectSearchablePlaceholder: 'Search TLDs...',
-          selectSelectedPlaceholder: 'Selected',
+          selectMenuLabel: 'TLDs',
+          selectMenuPlaceholder: 'Select TLDs',
+          selectMenuSearchablePlaceholder: 'Search TLDs...',
+          selectMenuSelectedLabel: 'selected',
+          selectMenuSelectedLabelEmpty: 'Select TLDs...',
         },
       },
       result: {
@@ -79,10 +80,11 @@ export default defineI18nConfig(() => ({
         form: {
           inputLabel: 'Domainname',
           inputPlaceholder: 'Domains suchen...',
-          selectLabel: 'TLDs',
-          selectPlaceholder: 'TLDs auswählen',
-          selectSearchablePlaceholder: 'TLDs suchen...',
-          selectSelectedPlaceholder: 'ausgewählt',
+          selectMenuLabel: 'TLDs',
+          selectMenuPlaceholder: 'TLDs auswählen',
+          selectMenuSearchablePlaceholder: 'TLDs suchen...',
+          selectMenuSelectedLabel: 'ausgewählt',
+          selectMenuSelectedLabelEmpty: 'TLDs auswählen...',
         },
       },
       result: {
