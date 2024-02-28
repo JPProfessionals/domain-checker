@@ -13,7 +13,7 @@ export default defineI18nConfig(() => ({
       },
       header: {
         title: 'JPP\'s Domain Checker',
-        subtitle:
+        subTitle:
           'Check if your desired domain is available in seconds without ads.',
         checkDomain: 'Check Domain',
         openSourceRepo: 'Open Source Repository',
@@ -40,8 +40,8 @@ export default defineI18nConfig(() => ({
       modal: {
         headline: 'Redirect away?',
         title: 'External URL',
-        subTitle: 'You\'re leaving this site to an external domain!',
-        button: 'I understand, please redirect me',
+        subTitle: 'You\'re leaving this site to an unknown external domain!',
+        button: 'I understand, please redirect me...',
       },
 
       notifications: {
@@ -94,8 +94,8 @@ export default defineI18nConfig(() => ({
       modal: {
         headline: 'Weiterleitung?',
         title: 'Externe URL',
-        subTitle: 'Du verlässt diese Seite zu einer externen Domain!',
-        button: 'Ich verstehe, bitte leite mich weiter',
+        subTitle: 'Du verlässt diese Seite zu einer unbekannten externen Domain!',
+        button: 'Ich verstehe, bitte leite mich weiter...',
       },
       notifications: {
         generalError:

@@ -112,7 +112,7 @@ function openLinkModal(domain: string) {
   <div class="mb-6">
     <ULandingHero
       :title="$t('header.title', { returnObjects: true })"
-      :description="$t('header.subtitle', { returnObjects: true })"
+      :description="$t('header.subTitle', { returnObjects: true })"
     >
       <template #links>
         <UButton
