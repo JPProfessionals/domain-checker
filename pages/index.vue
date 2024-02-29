@@ -168,7 +168,7 @@ function openLinkModal(domain: string) {
                       returnObjects: true,
                     })
                   "
-                  :autofocus="true"
+                  :autofocus="false"
                   :required="true"
                   :ui="{ icon: { trailing: { pointer: '' } } }"
                 >
