@@ -66,7 +66,7 @@ export default defineI18nConfig(() => ({
       },
       header: {
         title: 'JPP\'s Domain Checker',
-        subtitle:
+        subTitle:
           'Überprüfe, ob deine gewünschte Domain in Sekunden verfügbar ist, ohne Werbung.',
 
         checkDomain: 'Domain überprüfen',
