@@ -58,11 +58,6 @@ async function fetchTLDs() {
 
 async function search(q: string) {
   loading.value = true
-
-  if (fetchedTLDs.value.length == 0) {
-    await fetchTLDs()
-  }
-
   let filteredTlds = [...defaultTLDs, ...fetchedTLDs.value.slice(0, 50)]
 
   if (q.length != 0) {
