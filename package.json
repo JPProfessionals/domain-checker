@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "@nuxt/eslint-config": "^0.2.0",
-    "@nuxthq/studio": "^1.0.11",
+    "@nuxthq/studio": "^1.0.12",
     "@nuxtjs/eslint-module": "^4.1.0",
     "@nuxtjs/i18n": "^8.1.1",
     "@nuxtjs/seo": "2.0.0-rc.8",
