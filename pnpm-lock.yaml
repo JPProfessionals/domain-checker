@@ -33,8 +33,8 @@ dependencies:
     specifier: ^1.6.7
     version: 1.6.7
   h3:
-    specifier: ^1.10.1
-    version: 1.10.1
+    specifier: ^1.11.1
+    version: 1.11.1
   nuxt:
     specifier: ^3.10.3
     version: 3.10.3(eslint@8.57.0)(rollup@4.9.5)(typescript@5.3.3)(vite@5.1.4)(vue-tsc@1.8.27)
@@ -54,7 +54,7 @@ devDependencies:
     version: 8.1.1(rollup@4.9.5)(vue@3.3.13)
   '@nuxtjs/seo':
     specifier: 2.0.0-rc.8
-    version: 2.0.0-rc.8(@lezer/common@1.2.1)(@nuxt/devtools@1.0.8)(@unhead/shared@1.8.10)(@vue/compiler-core@3.4.15)(axios@1.6.7)(h3@1.10.1)(nuxt@3.10.3)(postcss@8.4.35)(rollup@4.9.5)(unhead@1.8.10)(vite@5.1.4)(vue@3.3.13)(webpack@5.90.3)
+    version: 2.0.0-rc.8(@lezer/common@1.2.1)(@nuxt/devtools@1.0.8)(@unhead/shared@1.8.10)(@vue/compiler-core@3.4.15)(axios@1.6.7)(h3@1.11.1)(nuxt@3.10.3)(postcss@8.4.35)(rollup@4.9.5)(unhead@1.8.10)(vite@5.1.4)(vue@3.3.13)(webpack@5.90.3)
   eslint:
     specifier: ^8.57.0
     version: 8.57.0
@@ -2168,11 +2168,11 @@ packages:
       - supports-color
     dev: false
 
-  /@nuxtjs/seo@2.0.0-rc.8(@lezer/common@1.2.1)(@nuxt/devtools@1.0.8)(@unhead/shared@1.8.10)(@vue/compiler-core@3.4.15)(axios@1.6.7)(h3@1.10.1)(nuxt@3.10.3)(postcss@8.4.35)(rollup@4.9.5)(unhead@1.8.10)(vite@5.1.4)(vue@3.3.13)(webpack@5.90.3):
+  /@nuxtjs/seo@2.0.0-rc.8(@lezer/common@1.2.1)(@nuxt/devtools@1.0.8)(@unhead/shared@1.8.10)(@vue/compiler-core@3.4.15)(axios@1.6.7)(h3@1.11.1)(nuxt@3.10.3)(postcss@8.4.35)(rollup@4.9.5)(unhead@1.8.10)(vite@5.1.4)(vue@3.3.13)(webpack@5.90.3):
     resolution: {integrity: sha512-N0Ke7A5dHkF5oY9F3VAQAPu0gfkYQHdepIPc2g/GFs+lgNB352djvJ9rNSgVDsxWKmP3RJ1iubl8orCcJiIxyA==}
     dependencies:
       '@nuxt/kit': 3.10.3(rollup@4.9.5)
-      '@nuxtjs/sitemap': 5.1.0(@nuxt/devtools@1.0.8)(@vue/compiler-core@3.4.15)(axios@1.6.7)(h3@1.10.1)(nuxt@3.10.3)(postcss@8.4.35)(rollup@4.9.5)(vite@5.1.4)(vue@3.3.13)(webpack@5.90.3)
+      '@nuxtjs/sitemap': 5.1.0(@nuxt/devtools@1.0.8)(@vue/compiler-core@3.4.15)(axios@1.6.7)(h3@1.11.1)(nuxt@3.10.3)(postcss@8.4.35)(rollup@4.9.5)(vite@5.1.4)(vue@3.3.13)(webpack@5.90.3)
       chalk: 5.3.0
       defu: 6.1.4
       nuxt-link-checker: 3.0.0-rc.6(@nuxt/devtools@1.0.8)(@vue/compiler-core@3.4.15)(axios@1.6.7)(nuxt@3.10.3)(postcss@8.4.35)(rollup@4.9.5)(vite@5.1.4)(vue@3.3.13)(webpack@5.90.3)
@@ -2213,7 +2213,7 @@ packages:
       - webpack
     dev: true
 
-  /@nuxtjs/sitemap@5.1.0(@nuxt/devtools@1.0.8)(@vue/compiler-core@3.4.15)(axios@1.6.7)(h3@1.10.1)(nuxt@3.10.3)(postcss@8.4.35)(rollup@4.9.5)(vite@5.1.4)(vue@3.3.13)(webpack@5.90.3):
+  /@nuxtjs/sitemap@5.1.0(@nuxt/devtools@1.0.8)(@vue/compiler-core@3.4.15)(axios@1.6.7)(h3@1.11.1)(nuxt@3.10.3)(postcss@8.4.35)(rollup@4.9.5)(vite@5.1.4)(vue@3.3.13)(webpack@5.90.3):
     resolution: {integrity: sha512-F7fAAdzHLJsca0CBJEvZD6Jbl5mZ/egMFJqDjdUByTsaPAygP+FcXhV/lycAtwDMNWThwyZaV3zKyRl2yxX3BQ==}
     dependencies:
       '@nuxt/devtools-kit': 1.0.8(nuxt@3.10.3)(rollup@4.9.5)(vite@5.1.4)
@@ -2223,7 +2223,7 @@ packages:
       chalk: 5.3.0
       defu: 6.1.4
       floating-vue: 5.2.2(@nuxt/kit@3.10.3)(vue@3.3.13)
-      h3-compression: 0.3.2(h3@1.10.1)
+      h3-compression: 0.3.2(h3@1.11.1)
       nuxt-site-config: 2.2.9(@nuxt/devtools@1.0.8)(@vue/compiler-core@3.4.15)(axios@1.6.7)(nuxt@3.10.3)(postcss@8.4.35)(rollup@4.9.5)(vite@5.1.4)(vue@3.3.13)(webpack@5.90.3)
       nuxt-site-config-kit: 2.2.9(rollup@4.9.5)(vue@3.3.13)
       ofetch: 1.3.3
@@ -5111,6 +5111,7 @@ packages:
 
   /destr@2.0.2:
     resolution: {integrity: sha512-65AlobnZMiCET00KaFFjUefxDX0khFA/E4myqZ7a6Sq1yZtR8+FVIvilVX66vF2uobSumxooYZChiRPCKNqhmg==}
+    dev: false
 
   /destr@2.0.3:
     resolution: {integrity: sha512-2N3BOUU4gYMpTP24s5rF5iP7BDr7uNTCs4ozw3kf/eKfvWSIu93GEBi5m427YoyJoeOzQ5smuu4nNAPGb8idSQ==}
@@ -5975,26 +5976,13 @@ packages:
     dependencies:
       duplexer: 0.1.2
 
-  /h3-compression@0.3.2(h3@1.10.1):
+  /h3-compression@0.3.2(h3@1.11.1):
     resolution: {integrity: sha512-B+yCKyDRnO0BXSfjAP4tCXJgJwmnKp3GyH5Yh66mY9KuOCrrGQSPk/gBFG2TgH7OyB/6mvqNZ1X0XNVuy0qRsw==}
     peerDependencies:
       h3: ^1.6.0
     dependencies:
-      h3: 1.10.1
+      h3: 1.11.1
     dev: true
-
-  /h3@1.10.1:
-    resolution: {integrity: sha512-UBAUp47hmm4BB5/njB4LrEa9gpuvZj4/Qf/ynSMzO6Ku2RXaouxEfiG2E2IFnv6fxbhAkzjasDxmo6DFdEeXRg==}
-    dependencies:
-      cookie-es: 1.0.0
-      defu: 6.1.4
-      destr: 2.0.2
-      iron-webcrypto: 1.0.0
-      ohash: 1.1.3
-      radix3: 1.1.0
-      ufo: 1.3.2
-      uncrypto: 0.1.3
-      unenv: 1.9.0
 
   /h3@1.11.1:
     resolution: {integrity: sha512-AbaH6IDnZN6nmbnJOH72y3c5Wwh9P97soSVdGSBbcDACRdkC0FEWf25pzx4f/NuOCK6quHmW18yF2Wx+G4Zi1A==}
@@ -10229,9 +10217,6 @@ packages:
     resolution: {integrity: sha512-pXWcraxM0uxAS+tN0AG/BF2TyqmHO014Z070UsJ+pFvYuRSq8KH8DmWpnbXe0pEPDHXZV3FcAbJkijJ5oNEnWw==}
     engines: {node: '>=14.17'}
     hasBin: true
-
-  /ufo@1.3.2:
-    resolution: {integrity: sha512-o+ORpgGwaYQXgqGDwd+hkS4PuZ3QnmqMMxRuajK/a38L6fTpcE5GPIfrf+L/KemFzfUpeUQc1rRS1iDBozvnFA==}
 
   /ufo@1.4.0:
     resolution: {integrity: sha512-Hhy+BhRBleFjpJ2vchUNN40qgkh0366FWJGqVLYBHev0vpHTrXSA0ryT+74UiW6KWsldNurQMKGqCm1M2zBciQ==}
