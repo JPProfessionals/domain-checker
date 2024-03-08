@@ -7,20 +7,20 @@ import type { FormSubmitEvent } from '#ui/types'
 import type { DomainResult, DomainsResult } from '../types/domain'
 
 // 2. Reactive States and Refs
+const defaultTlds = ['.com', '.net', '.org', '.de']
 const { t } = useI18n()
 const domainsResults: Ref<DomainsResult> = ref({
   domains: [] as DomainResult[],
 })
 const error = ref('')
 const loading = ref(false)
+const loadingTlds = ref(false)
 const isOpen = ref(false)
 const currentLink = ref('')
 
-const defaultTLDs = ['.com', '.net', '.org', '.de']
-let TLDs = [...defaultTLDs]
 const formState = reactive({
   search: '',
-  selectedTLDs: [...defaultTLDs], // Use a spread to ensure reactivity is maintained
+  selectedTLDs: [...defaultTlds],
 })
 
 // 3. Validation Schema
@@ -35,38 +35,32 @@ const schema = z.object({
 })
 
 // 4. Lifecycle Hooks
-onNuxtReady(async () => {
-  await fetchTLDs()
-})
-
 const fetchedTLDs = ref([] as string[])
 
 // 5. Methods
-async function fetchTLDs() {
-  const { data, error: fetchError } = await useFetch('/api/getTlds')
-  if (fetchError.value || !data.value || data.value.length === 0) {
+async function fetchTLDs(input: string): Promise<string[]> {
+  const { data, error: fetchError } = await useFetch('/api/getTlds', {
+    method: 'post',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ input }),
+  })
+  if(fetchError.value || !data.value) {
     console.error('Failed to fetch TLDs, using default TLDs:', fetchError.value)
-    TLDs = defaultTLDs
-    return
+    return defaultTlds
   }
-  fetchedTLDs.value = data.value
-    .map((tld: string) => (tld.startsWith('.') ? tld : `.${tld}`))
-    .filter((tld: string) => !defaultTLDs.includes(tld))
-  TLDs = [...defaultTLDs, ...fetchedTLDs.value.slice(0, 50)]
-  formState.selectedTLDs = [...defaultTLDs]
+  return data.value
 }
 
-async function search(q: string) {
-  loading.value = true
-  let filteredTlds = [...defaultTLDs, ...fetchedTLDs.value.slice(0, 50)]
-
-  if (q.length != 0) {
-    filteredTlds = fetchedTLDs.value.filter((tld) => tld.includes(q))
+async function search(q: string) {  
+  loadingTlds.value = true
+  let data = formState.selectedTLDs
+  if(q.length > 1){
+    data = await fetchTLDs(q)
   }
+  fetchedTLDs.value = data.map((tld: string) => (tld.startsWith('.') ? tld : `.${tld}`))
+  loadingTlds.value = false
 
-  loading.value = false
-
-  return filteredTlds
+  return fetchedTLDs.value
 }
 
 async function checkDomains() {
@@ -191,14 +185,15 @@ function openLinkModal(domain: string) {
                 <USelectMenu
                   v-model="formState.selectedTLDs"
                   size="xl"
-                  :options="TLDs"
                   multiple
                   :required="true"
+                  :loading="loadingTlds"
                   :placeholder="
                     $t('search.form.selectMenuPlaceholder', {
                       returnObjects: true,
                     })
                   "
+                  trailing
                   :searchable="search"
                   :searchable-placeholder="
                     $t('search.form.selectMenuSearchablePlaceholder', {
