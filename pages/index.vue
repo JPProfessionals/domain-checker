@@ -2,7 +2,7 @@
 // 1. Imports
 import { ref, reactive } from 'vue'
 import { z } from 'zod'
-import { useFetch, useI18n } from '#imports'
+import { useI18n } from '#imports'
 import type { FormSubmitEvent } from '#ui/types'
 import type { DomainResult, DomainsResult } from '../types/domain'
 
@@ -39,7 +39,7 @@ const fetchedTLDs = ref([] as string[])
 
 // 5. Methods
 async function fetchTLDs(input: string): Promise<string[]> {
-  const { data, error: fetchError } = await useFetch('/api/getTlds', {
+  const { data, error: fetchError } = await $fetch('/api/getTlds', {
     method: 'post',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ input }),
@@ -69,7 +69,7 @@ async function checkDomains() {
     domain: formState.search,
     tlds: formState.selectedTLDs,
   }
-  const { data, error: fetchError } = await useFetch('/api/checkDomains', {
+  const { data, error: fetchError } = await $fetch('/api/checkDomains', {
     method: 'post',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(requestBody),
