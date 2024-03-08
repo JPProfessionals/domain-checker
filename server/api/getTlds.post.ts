@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     return tlds // Returning the list of TLDs
   } catch (error: any) {
     console.error('Error fetching TLDs from API:', error)
-    console.log('Error Body',error.response.data)
+    console.error('Error Body',error.response.data)
     // Returning an error response
     throw createError({ statusMessage: 'Failed to fetch TLDs', statusCode: 500 })
   }

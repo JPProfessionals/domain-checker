@@ -39,11 +39,12 @@ const fetchedTLDs = ref([] as string[])
 
 // 5. Methods
 async function fetchTLDs(input: string): Promise<string[]> {
-  const { data, error: fetchError } = await $fetch('/api/getTlds', {
+  const { data, error: fetchError } = await useAsyncData('tlds', () => $fetch('/api/getTlds',{
     method: 'post',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ input }),
-  })
+  }))
+
   if(fetchError.value || !data.value) {
     console.error('Failed to fetch TLDs, using default TLDs:', fetchError.value)
     return defaultTlds
@@ -69,11 +70,11 @@ async function checkDomains() {
     domain: formState.search,
     tlds: formState.selectedTLDs,
   }
-  const { data, error: fetchError } = await $fetch('/api/checkDomains', {
+  const { data, error: fetchError } = await useAsyncData('domains',()=>$fetch('/api/checkDomains', {
     method: 'post',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(requestBody),
-  })
+  }))
   if (fetchError.value) {
     console.log('fetchError', fetchError)
     error.value = t('notifications.generalError', { returnObjects: true })
