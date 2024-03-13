@@ -80,7 +80,7 @@ const availableLocales = computed(() => {
   <UFooter>
     <template #center>
       <small>Copyright © {{ new Date().getFullYear() }} | Created with
-        <UIcon name="i-heroicons-heart" /> from JPProfessionals</small>
+        <UIcon name="i-heroicons-heart" /> from <a href="https://jpprofessionals.de" target="_blank">JPProfessionals</a></small>
     </template>
   </UFooter>
 </template>
