@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { useI18n } from '#imports'
 import type { FormSubmitEvent } from '#ui/types'
 import type { DomainResult, DomainsResult } from '../types/domain'
+import { useVirtualList } from '@vueuse/core'
 
 // 2. Reactive States and Refs
 const defaultTlds = ['.com', '.net', '.org', '.de']
@@ -14,13 +15,27 @@ const domainsResults: Ref<DomainsResult> = ref({
 })
 const error = ref('')
 const loading = ref(false)
-const loadingTlds = ref(false)
 const isOpen = ref(false)
 const currentLink = ref('')
+const open = ref(false)
 
 const formState = reactive({
   search: '',
-  selectedTLDs: [...defaultTlds],
+  selectedTLDs: defaultTlds,
+})
+
+const fetchedTLDs = ref([] as string[])
+const search = ref('')
+
+const filteredTlds = computed(() => {
+  return fetchedTLDs.value.filter((i) =>
+    i.includes(search.value.toLowerCase())
+  ) as any[]
+})
+
+const { list, containerProps, wrapperProps } = useVirtualList(filteredTlds, {
+  itemHeight: (i) => filteredTlds.value[i].height + 8,
+  overscan: 10,
 })
 
 // 3. Validation Schema
@@ -35,33 +50,63 @@ const schema = z.object({
 })
 
 // 4. Lifecycle Hooks
-const fetchedTLDs = ref([] as string[])
+onNuxtReady(async () => {
+  const data = await fetchTLDs()
+  fetchedTLDs.value = data.map((tld: string) =>
+    tld.startsWith('.') ? tld : `.${tld}`
+  )
+})
 
 // 5. Methods
-async function fetchTLDs(input: string): Promise<string[]> {
-  const { data, error: fetchError } = await useAsyncData('tlds', () => $fetch('/api/getTlds',{
-    method: 'post',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ input }),
-  }))
+defineShortcuts({
+  ctrl_i: () => {
+    open.value = !open.value
+    toggleTldPicker()
+  },
+})
 
-  if(fetchError.value || !data.value) {
+function toggleTldPicker() {
+  fetchedTLDs.value = fetchedTLDs.value.sort((a, b) => {
+    if (formState.selectedTLDs?.includes(a)) {
+      return -1
+    }
+
+    if (formState.selectedTLDs?.includes(b)) {
+      return 1
+    }
+
+    return a > b ? 1 : -1
+  })
+
+  search.value = ''
+}
+
+async function fetchTLDs(input: any = null): Promise<string[]> {
+  const { data, error: fetchError } = await useAsyncData('tlds', () =>
+    $fetch('/api/getTlds', {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ input: input ?? '', pageSize: -1 }),
+    })
+  )
+
+  if (fetchError.value || !data.value) {
     console.error('Failed to fetch TLDs, using default TLDs:', fetchError.value)
     return defaultTlds
   }
+
   return data.value
 }
 
-async function search(q: string) {  
-  loadingTlds.value = true
-  let data = formState.selectedTLDs
-  if(q.length > 1){
-    data = await fetchTLDs(q)
-  }
-  fetchedTLDs.value = data.map((tld: string) => (tld.startsWith('.') ? tld : `.${tld}`))
-  loadingTlds.value = false
+function selectTld(data: string) {
+  const index = formState.selectedTLDs.indexOf(data)
 
-  return fetchedTLDs.value
+  if (index !== -1) {
+    formState.selectedTLDs.splice(index, 1)
+    return
+  }
+
+  formState.selectedTLDs = [...formState.selectedTLDs, data]
 }
 
 async function checkDomains() {
@@ -70,13 +115,14 @@ async function checkDomains() {
     domain: formState.search,
     tlds: formState.selectedTLDs,
   }
-  const { data, error: fetchError } = await useAsyncData('domains',()=>$fetch('/api/checkDomains', {
-    method: 'post',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(requestBody),
-  }))
+  const { data, error: fetchError } = await useAsyncData('domains', () =>
+    $fetch('/api/checkDomains', {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestBody),
+    })
+  )
   if (fetchError.value) {
-    console.log('fetchError', fetchError)
     error.value = t('notifications.generalError', { returnObjects: true })
     loading.value = false
     return
@@ -97,6 +143,15 @@ function openLinkModal(domain: string) {
   isOpen.value = true
 }
 </script>
+
+<style scoped>
+:deep(.popover-container) {
+  inset: unset !important;
+  transform: unset !important;
+  width: 100%;
+  margin-top: 8px !important;
+}
+</style>
 
 <template>
   <div class="mb-6">
@@ -183,42 +238,104 @@ function openLinkModal(domain: string) {
                 name="tlds"
                 class="mb-6"
               >
-                <USelectMenu
-                  v-model="formState.selectedTLDs"
-                  size="xl"
-                  multiple
-                  :required="true"
-                  :loading="loadingTlds"
-                  :placeholder="
-                    $t('search.form.selectMenuPlaceholder', {
-                      returnObjects: true,
-                    })
-                  "
-                  trailing
-                  :searchable="search"
-                  :searchable-placeholder="
-                    $t('search.form.selectMenuSearchablePlaceholder', {
-                      returnObjects: true,
-                    })
-                  "
+                <UPopover
+                  overlay
+                  v-model:open="open"
+                  :popper="{ arrow: true }"
+                  :ui="{
+                    container: 'z-50 popover-container group',
+                    popper: {
+                      strategy: 'absolute',
+                    },
+                  }"
                 >
-                  <template #label>
-                    <template v-if="formState.selectedTLDs.length != 0">
-                      <span>{{ formState.selectedTLDs.length }}
-                        {{
-                          $t('search.form.selectMenuSelectedLabel', { returnObjects: true })
-                        }}</span>
-                    </template>
-                    <template v-else>
-                      <span class="text-gray-500 dark:text-gray-400 truncate">
-                        {{
-                          $t('search.form.selectMenuSelectedLabelEmpty', {
+                  <div class="flex flex-auto">
+                    <UButton
+                      size="xl"
+                      color="primary"
+                      class="flex flex-1 rounded-none rounded-s"
+                      variant="outline"
+                      @click="toggleTldPicker()"
+                    >
+                      {{
+                        formState.selectedTLDs.length +
+                        ' ' +
+                        $t('search.form.selectMenuSelectedLabel', {
+                          returnObjects: true,
+                        })
+                      }}
+                    </UButton>
+                    <UButton
+                      size="xl"
+                      color="primary"
+                      class="flex flex-initial justify-center rounded-none rounded-e"
+                      variant="outline"
+                      :icon="
+                        open
+                          ? 'i-heroicons-chevron-up-20-solid'
+                          : 'i-heroicons-chevron-down-20-solid'
+                      "
+                      @click="toggleTldPicker()"
+                    />
+                  </div>
+
+                  <template #panel>
+                    <div
+                      class="w-full border border-[rgb(var(--color-primary-400))] rounded"
+                      style="background-color: rgb(var(--ui-background))"
+                    >
+                      <UInput
+                        v-model="search"
+                        class="p-2"
+                        name="search"
+                        variant="outline"
+                        size="xl"
+                        :placeholder="
+                          $t('search.form.selectMenuPlaceholder', {
                             returnObjects: true,
                           })
-                        }}</span>
-                    </template>
+                        "
+                        :autofocus="true"
+                      >
+                      </UInput>
+
+                      <div
+                        v-bind="containerProps"
+                        class="h-64 pt-0 overflow-auto p-2"
+                      >
+                        <div v-bind="wrapperProps">
+                          <div
+                            v-for="{ index, data } in list"
+                            :key="index"
+                            class="p-2 mt-2 flex space-x-2 justify-center items-center"
+                            :style="{
+                              height: `${data.height}px`,
+                            }"
+                            @click="selectTld(data)"
+                          >
+                            <div
+                              class="flex flex-1 cursor-pointer"
+                              :class="
+                                formState.selectedTLDs.includes(data)
+                                  ? 'text-[rgb(var(--color-primary-400))]'
+                                  : ''
+                              "
+                            >
+                              {{ data }}
+                            </div>
+                            <div class="flex">
+                              <Icon
+                                class="text-[rgb(var(--color-primary-400))]"
+                                name="material-symbols:check"
+                                v-if="formState.selectedTLDs.includes(data)"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </template>
-                </USelectMenu>
+                </UPopover>
               </UFormGroup>
             </div>
           </div>
@@ -253,17 +370,17 @@ function openLinkModal(domain: string) {
           :ui="
             result.available
               ? {
-                icon: {
-                  wrapper: 'mb-2 flex',
-                  base: 'w-10 h-10 flex-shrink-0 text-green-500 dark:text-green-500',
-                },
-              }
+                  icon: {
+                    wrapper: 'mb-2 flex',
+                    base: 'w-10 h-10 flex-shrink-0 text-green-500 dark:text-green-500',
+                  },
+                }
               : {
-                icon: {
-                  wrapper: 'mb-2 flex',
-                  base: 'w-10 h-10 flex-shrink-0 text-red-500 dark:text-red-500',
-                },
-              }
+                  icon: {
+                    wrapper: 'mb-2 flex',
+                    base: 'w-10 h-10 flex-shrink-0 text-red-500 dark:text-red-500',
+                  },
+                }
           "
           :description="
             result.available
