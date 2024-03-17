@@ -18,6 +18,7 @@ const loading = ref(false)
 const isOpen = ref(false)
 const currentLink = ref('')
 const open = ref(false)
+const popover = ref<null | HTMLElement>(null)
 
 const formState = reactive({
   search: '',
@@ -78,6 +79,10 @@ function toggleTldPicker() {
     return a > b ? 1 : -1
   })
 
+  setTimeout(() => {
+    popover.value?.scrollIntoView({ behavior: 'smooth' })
+  }, 200)
+
   search.value = ''
 }
 
@@ -91,7 +96,10 @@ async function fetchTLDs(input: any = null): Promise<string[]> {
   )
 
   if (fetchError.value || !data.value) {
-    console.error('Failed to fetch TLDs, using default TLDs:', fetchError.value)
+    console.error(
+      t('notifications.generalError', { returnObjects: true }),
+      fetchError.value
+    )
     return defaultTlds
   }
 
@@ -281,6 +289,7 @@ function openLinkModal(domain: string) {
 
                   <template #panel>
                     <div
+                      ref="popover"
                       class="w-full border border-[rgb(var(--color-primary-400))] rounded"
                       style="background-color: rgb(var(--ui-background))"
                     >
@@ -296,6 +305,7 @@ function openLinkModal(domain: string) {
                           })
                         "
                         :autofocus="true"
+                        autofocusDelay="400"
                       >
                       </UInput>
 
