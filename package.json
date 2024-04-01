@@ -22,7 +22,7 @@
     "@vueuse/core": "^10.9.0",
     "axios": "^1.6.7",
     "h3": "^1.11.1",
-    "nuxt": "^3.10.3"
+    "nuxt": "^3.11.1"
   },
   "devDependencies": {
     "@nuxt/devtools": "^1.0.8",
