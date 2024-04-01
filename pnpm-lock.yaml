@@ -21,8 +21,8 @@ dependencies:
     specifier: ^1.1.90
     version: 1.1.93
   '@nuxt/content':
-    specifier: ^2.12.0
-    version: 2.12.0(nuxt@3.10.3)(rollup@4.9.5)(vue@3.3.13)
+    specifier: ^2.12.1
+    version: 2.12.1(nuxt@3.10.3)(rollup@4.9.5)(vue@3.3.13)
   '@nuxt/ui-pro':
     specifier: ^1.0.1
     version: 1.0.1(axios@1.6.7)(nuxt@3.10.3)(rollup@4.9.5)(vite@5.1.4)(vue@3.3.13)
@@ -1540,17 +1540,17 @@ packages:
     transitivePeerDependencies:
       - supports-color
 
-  /@nuxt/content@2.12.0(nuxt@3.10.3)(rollup@4.9.5)(vue@3.3.13):
-    resolution: {integrity: sha512-XQkbkJzFRWKdX4aoVDprqLphbQGDsRX35ZRgHe4i7Phe3F1z2EzXVhZ9WXBTmpXau3MkLlmsQ+NzcRns1kOOvQ==}
+  /@nuxt/content@2.12.1(nuxt@3.10.3)(rollup@4.9.5)(vue@3.3.13):
+    resolution: {integrity: sha512-xW4xjyYm6zqglb17Tu0J+rpKUV1PF9zp6SLu1lopylFnerdyImtce84206HT6Zd/DJgivKtoW4dyyJn0ZaSqCQ==}
     dependencies:
       '@nuxt/kit': 3.10.3(rollup@4.9.5)
-      '@nuxtjs/mdc': 0.5.0(rollup@4.9.5)
+      '@nuxtjs/mdc': 0.6.1(rollup@4.9.5)
       '@vueuse/core': 10.9.0(vue@3.3.13)
       '@vueuse/head': 2.0.0(vue@3.3.13)
-      '@vueuse/nuxt': 10.8.0(nuxt@3.10.3)(rollup@4.9.5)(vue@3.3.13)
+      '@vueuse/nuxt': 10.9.0(nuxt@3.10.3)(rollup@4.9.5)(vue@3.3.13)
       consola: 3.2.3
       defu: 6.1.4
-      destr: 2.0.2
+      destr: 2.0.3
       json5: 2.2.3
       knitwork: 1.0.0
       listhen: 1.7.2
@@ -2085,14 +2085,14 @@ packages:
       - vue-i18n-bridge
     dev: true
 
-  /@nuxtjs/mdc@0.5.0(rollup@4.9.5):
-    resolution: {integrity: sha512-480Ajc7o/YAl9b21btd0oRtVe/UjUWmVSEWauS+H+izwEGdGvJTVfZRdaiAXcXKl+UmUTpf+POel027sE9HAZQ==}
+  /@nuxtjs/mdc@0.6.1(rollup@4.9.5):
+    resolution: {integrity: sha512-zS5QK7DZ/SBrjqQX1DOy7GnxKy+wbj2+LvooefOWmQqHfLTAqJLVIjuv/BmKnQWiRCq19+uysys3iY42EoY5/A==}
     dependencies:
       '@nuxt/kit': 3.10.3(rollup@4.9.5)
       '@shikijs/transformers': 1.1.7
       '@types/hast': 3.0.4
       '@types/mdast': 4.0.3
-      '@vue/compiler-core': 3.4.15
+      '@vue/compiler-core': 3.4.21
       consola: 3.2.3
       debug: 4.3.4
       defu: 6.1.4
@@ -2113,7 +2113,7 @@ packages:
       rehype-sort-attributes: 5.0.0
       remark-emoji: 4.0.1
       remark-gfm: 4.0.0
-      remark-mdc: 3.0.2
+      remark-mdc: 3.2.0
       remark-parse: 11.0.0
       remark-rehype: 11.1.0
       scule: 1.3.0
@@ -3615,6 +3615,16 @@ packages:
       estree-walker: 2.0.2
       source-map-js: 1.0.2
 
+  /@vue/compiler-core@3.4.21:
+    resolution: {integrity: sha512-MjXawxZf2SbZszLPYxaFCjxfibYrzr3eYbKxwpLR9EQN+oaziSu3qKVbwBERj1IFIB8OLUewxB5m/BFzi613og==}
+    dependencies:
+      '@babel/parser': 7.23.9
+      '@vue/shared': 3.4.21
+      entities: 4.5.0
+      estree-walker: 2.0.2
+      source-map-js: 1.0.2
+    dev: false
+
   /@vue/compiler-dom@3.3.13:
     resolution: {integrity: sha512-EYRDpbLadGtNL0Gph+HoKiYqXLqZ0xSSpR5Dvnu/Ep7ggaCbjRDIus1MMxTS2Qm0koXED4xSlvTZaTnI8cYAsw==}
     dependencies:
@@ -3750,6 +3760,10 @@ packages:
 
   /@vue/shared@3.4.20:
     resolution: {integrity: sha512-KTEngal0aiUvNJ6I1Chk5Ew5XqChsFsxP4GKAYXWb99zKJWjNU72p2FWEOmZWHxHcqtniOJsgnpd3zizdpfEag==}
+
+  /@vue/shared@3.4.21:
+    resolution: {integrity: sha512-PuJe7vDIi6VYSinuEbUIQgMIRZGgM8e4R+G+/dQTk0X1NEdvgvvgv7m+rfmDH1gZzyA1OjjoWskvHlfRNfQf3g==}
+    dev: false
 
   /@vueuse/core@10.7.2(vue@3.3.13):
     resolution: {integrity: sha512-AOyAL2rK0By62Hm+iqQn6Rbu8bfmbgaIMXcE3TSr7BdQ42wnSFlwIdPjInO62onYsEMK/yDMU8C6oGfDAtZ2qQ==}
@@ -3936,6 +3950,25 @@ packages:
       - rollup
       - supports-color
       - vue
+    dev: true
+
+  /@vueuse/nuxt@10.9.0(nuxt@3.10.3)(rollup@4.9.5)(vue@3.3.13):
+    resolution: {integrity: sha512-nC4Efg28Q6E41fUD5R+zM9uT5c+NfaDzaJCpqaEV/qHj+/BNJmkDBK8POLIUsiVOY35d0oD/YxZ+eVizqWBZow==}
+    peerDependencies:
+      nuxt: ^3.0.0
+    dependencies:
+      '@nuxt/kit': 3.10.3(rollup@4.9.5)
+      '@vueuse/core': 10.9.0(vue@3.3.13)
+      '@vueuse/metadata': 10.9.0
+      local-pkg: 0.5.0
+      nuxt: 3.10.3(eslint@8.57.0)(rollup@4.9.5)(typescript@5.3.3)(vite@5.1.4)(vue-tsc@1.8.27)
+      vue-demi: 0.14.7(vue@3.3.13)
+    transitivePeerDependencies:
+      - '@vue/composition-api'
+      - rollup
+      - supports-color
+      - vue
+    dev: false
 
   /@vueuse/shared@10.7.2(vue@3.3.13):
     resolution: {integrity: sha512-qFbXoxS44pi2FkgFjPvF4h7c9oMDutpyBdcJdMYIMg9XyXli2meFMuaKn+UMgsClo//Th6+beeCgqweT/79BVA==}
@@ -5108,10 +5141,6 @@ packages:
   /dequal@2.0.3:
     resolution: {integrity: sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==}
     engines: {node: '>=6'}
-
-  /destr@2.0.2:
-    resolution: {integrity: sha512-65AlobnZMiCET00KaFFjUefxDX0khFA/E4myqZ7a6Sq1yZtR8+FVIvilVX66vF2uobSumxooYZChiRPCKNqhmg==}
-    dev: false
 
   /destr@2.0.3:
     resolution: {integrity: sha512-2N3BOUU4gYMpTP24s5rF5iP7BDr7uNTCs4ozw3kf/eKfvWSIu93GEBi5m427YoyJoeOzQ5smuu4nNAPGb8idSQ==}
@@ -9247,8 +9276,8 @@ packages:
       - supports-color
     dev: false
 
-  /remark-mdc@3.0.2:
-    resolution: {integrity: sha512-HoCaTwIkvYp1Kj9EiKMNpfAjLO53PwiaeA5J2o+uIBfCHjcOWai3oDmCkEZVCIHbHgU/qSZ8JeiQftksnVKTeQ==}
+  /remark-mdc@3.2.0:
+    resolution: {integrity: sha512-zRi5frIC3O/bcxXgUPHfQ3lyRBKPtokrGnsOPvNrt9bqp4EfjPtduzcWgO4R1WeHYUnvl0zeBStvGsFkJIZf+Q==}
     dependencies:
       '@types/mdast': 4.0.3
       '@types/unist': 3.0.2
