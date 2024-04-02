@@ -18,19 +18,19 @@ dependencies:
     specifier: ^1.1.76
     version: 1.1.76
   '@iconify-json/simple-icons':
-    specifier: ^1.1.90
+    specifier: ^1.1.97
     version: 1.1.97
   '@nuxt/content':
     specifier: ^2.12.1
     version: 2.12.1(nuxt@3.11.1)(rollup@4.13.2)(vue@3.4.21)
   '@nuxt/ui-pro':
-    specifier: ^1.0.1
+    specifier: ^1.1.0
     version: 1.1.0(axios@1.6.8)(nuxt@3.11.1)(rollup@4.13.2)(vite@5.2.7)(vue@3.4.21)
   '@vueuse/core':
     specifier: ^10.9.0
     version: 10.9.0(vue@3.4.21)
   axios:
-    specifier: ^1.6.7
+    specifier: ^1.6.8
     version: 1.6.8
   h3:
     specifier: ^1.11.1
@@ -41,31 +41,31 @@ dependencies:
 
 devDependencies:
   '@nuxt/devtools':
-    specifier: ^1.0.8
+    specifier: ^1.1.5
     version: 1.1.5(@unocss/reset@0.58.9)(axios@1.6.8)(floating-vue@5.2.2)(nuxt@3.11.1)(rollup@4.13.2)(unocss@0.58.9)(vite@5.2.7)(vue@3.4.21)
   '@nuxt/eslint-config':
     specifier: ^0.2.0
     version: 0.2.0(eslint@8.57.0)
   '@nuxthq/studio':
-    specifier: ^1.0.12
+    specifier: ^1.0.13
     version: 1.0.13(rollup@4.13.2)
   '@nuxtjs/eslint-module':
     specifier: ^4.1.0
     version: 4.1.0(eslint@8.57.0)(rollup@4.13.2)(vite@5.2.7)(webpack@5.91.0)
   '@nuxtjs/i18n':
-    specifier: ^8.1.1
+    specifier: ^8.3.0
     version: 8.3.0(rollup@4.13.2)(vue@3.4.21)
   '@nuxtjs/seo':
-    specifier: 2.0.0-rc.8
-    version: 2.0.0-rc.8(@lezer/common@1.2.1)(@nuxt/devtools@1.1.5)(@unhead/shared@1.9.4)(@vue/compiler-core@3.4.21)(axios@1.6.8)(h3@1.11.1)(nuxt@3.11.1)(postcss@8.4.38)(rollup@4.13.2)(unhead@1.9.4)(vite@5.2.7)(vue@3.4.21)(webpack@5.91.0)
+    specifier: 2.0.0-rc.10
+    version: 2.0.0-rc.10(@lezer/common@1.2.1)(@nuxt/devtools@1.1.5)(@unhead/shared@1.9.4)(@vue/compiler-core@3.4.21)(axios@1.6.8)(h3@1.11.1)(nuxt@3.11.1)(postcss@8.4.38)(rollup@4.13.2)(unhead@1.9.4)(vite@5.2.7)(vue@3.4.21)(webpack@5.91.0)
   eslint:
     specifier: ^8.57.0
     version: 8.57.0
   nuxt-icon:
-    specifier: ^0.6.8
+    specifier: ^0.6.10
     version: 0.6.10(nuxt@3.11.1)(rollup@4.13.2)(vite@5.2.7)(vue@3.4.21)
   nuxt-security:
-    specifier: ^1.2.1
+    specifier: ^1.2.2
     version: 1.2.2(rollup@4.13.2)
   vue-tsc:
     specifier: ^2.0.7
@@ -1968,12 +1968,11 @@ packages:
       - supports-color
     dev: false
 
-  /@nuxtjs/seo@2.0.0-rc.8(@lezer/common@1.2.1)(@nuxt/devtools@1.1.5)(@unhead/shared@1.9.4)(@vue/compiler-core@3.4.21)(axios@1.6.8)(h3@1.11.1)(nuxt@3.11.1)(postcss@8.4.38)(rollup@4.13.2)(unhead@1.9.4)(vite@5.2.7)(vue@3.4.21)(webpack@5.91.0):
-    resolution: {integrity: sha512-N0Ke7A5dHkF5oY9F3VAQAPu0gfkYQHdepIPc2g/GFs+lgNB352djvJ9rNSgVDsxWKmP3RJ1iubl8orCcJiIxyA==}
+  /@nuxtjs/seo@2.0.0-rc.10(@lezer/common@1.2.1)(@nuxt/devtools@1.1.5)(@unhead/shared@1.9.4)(@vue/compiler-core@3.4.21)(axios@1.6.8)(h3@1.11.1)(nuxt@3.11.1)(postcss@8.4.38)(rollup@4.13.2)(unhead@1.9.4)(vite@5.2.7)(vue@3.4.21)(webpack@5.91.0):
+    resolution: {integrity: sha512-tmzXlGY7TzPNUowej4tufsmEFWU+9ZBICoEjZbmQ8IwKhh/6EofPq22d/7yRP41jJuYPieGztX+F0Ue9+7x2mg==}
     dependencies:
       '@nuxt/kit': 3.11.1(rollup@4.13.2)
       '@nuxtjs/sitemap': 5.1.2(@nuxt/devtools@1.1.5)(@vue/compiler-core@3.4.21)(axios@1.6.8)(h3@1.11.1)(nuxt@3.11.1)(postcss@8.4.38)(rollup@4.13.2)(vite@5.2.7)(vue@3.4.21)(webpack@5.91.0)
-      chalk: 5.3.0
       defu: 6.1.4
       nuxt-link-checker: 3.0.0-rc.7(@nuxt/devtools@1.1.5)(@vue/compiler-core@3.4.21)(axios@1.6.8)(nuxt@3.11.1)(postcss@8.4.38)(rollup@4.13.2)(vite@5.2.7)(vue@3.4.21)(webpack@5.91.0)
       nuxt-og-image: 3.0.0-rc.48(@lezer/common@1.2.1)(@nuxt/devtools@1.1.5)(@vue/compiler-core@3.4.21)(axios@1.6.8)(nuxt@3.11.1)(postcss@8.4.38)(rollup@4.13.2)(vite@5.2.7)(vue@3.4.21)(webpack@5.91.0)
