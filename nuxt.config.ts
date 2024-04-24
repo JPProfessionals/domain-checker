@@ -6,8 +6,16 @@ export default defineNuxtConfig({
     'nuxt-icon',
     'nuxt-security',
     '@nuxtjs/i18n',
-    '@nuxtjs/eslint-module'
+    '@nuxtjs/eslint-module',
+    '@nuxtjs/seo',
   ],
+  site: {
+    url: 'https://domain.jpprofessionals.de',
+    name: 'JPP\'s Domain Checker',
+    description:
+      'This is a streamlined open-source domain checker designed to quickly ascertain whether a domain is available or already in use, all without the annoyance of ads!',
+  },
+  ogImage: { enabled: false },
   ui: {
     icons: ['heroicons', 'simple-icons', 'circle-flags'],
   },
