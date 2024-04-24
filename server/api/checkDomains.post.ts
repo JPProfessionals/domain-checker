@@ -1,6 +1,5 @@
 import type { DomainsResult } from '../../types/domain'
 import { defineEventHandler, readBody } from 'h3'
-import axios from 'axios'
 
 export default defineEventHandler(async (event) => {
   // Reading JSON body from the POST request
@@ -34,13 +33,14 @@ function generateDomainList(baseDomain: string, tlds: string[]): string[] {
 
 async function checkDomains(domains: string[]): Promise<DomainsResult> {
   const url = 'https://api.godaddy.com/v1/domains/available?checkType=FAST'
-  const config = {
+
+  const response = await $fetch<any>(url, {
     headers: {
       Authorization: `sso-key ${process.env.GODADDY_API_KEY}:${process.env.GODADDY_API_SECRET}`,
       'Content-Type': 'application/json',
     },
-  }
-
-  const response = await axios.post(url, domains, config)
-  return response.data
+    body: domains,
+    method: 'POST'
+  })
+  return response
 }

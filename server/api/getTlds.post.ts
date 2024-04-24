@@ -1,6 +1,5 @@
 // Importing necessary modules from h3 and axios
 import { defineEventHandler } from 'h3'
-import axios from 'axios'
 
 export default defineEventHandler(async (event) => {
   let url = 'https://api.jpprofessionals.de/items/TLDS?fields[]=name'
@@ -16,8 +15,8 @@ export default defineEventHandler(async (event) => {
 
   try {
     // Fetching the list of TLDs from GoDaddy's API
-    const response = await axios.get(url)
-    const tlds = response.data.data.map((tld: any) => tld.name)
+    const response = await $fetch<any>(url)
+    const tlds = response.data.map((tld: any) => tld.name)
     return tlds // Returning the list of TLDs
   } catch (error: any) {
     console.error('Error fetching TLDs from API:', error)

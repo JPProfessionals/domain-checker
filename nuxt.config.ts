@@ -5,20 +5,11 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     'nuxt-icon',
     'nuxt-security',
-    '@nuxtjs/seo',
     '@nuxtjs/i18n',
-    '@nuxthq/studio',
-    '@nuxt/content',
-    '@nuxtjs/eslint-module',
+    '@nuxtjs/eslint-module'
   ],
-  site: {
-    url: 'https://domain.jpprofessionals.de',
-    name: 'JPP\'s Domain Checker',
-    description:
-      'This is a streamlined open-source domain checker designed to quickly ascertain whether a domain is available or already in use, all without the annoyance of ads!',
-  },
   ui: {
-    icons: ['heroicons', 'simple-icons', 'material-symbols', 'circle-flags'],
+    icons: ['heroicons', 'simple-icons', 'circle-flags'],
   },
   devtools: {
     enabled: true,
@@ -43,6 +34,12 @@ export default defineNuxtConfig({
         process.env.NODE_ENV === 'development' ? 'unsafe-none' : 'require-corp',
       contentSecurityPolicy: false,
     },
+  },
+  nitro: {
+    preset: 'cloudflare-pages',
+    prerender: {
+      autoSubfolderIndex: false
+    }
   },
   routeRules: {
     '/api/*': {

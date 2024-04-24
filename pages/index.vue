@@ -171,7 +171,7 @@ function openLinkModal(domain: string) {
         <UButton
           to="#check"
           size="lg"
-          icon="i-material-symbols-domain-verification"
+          icon="i-heroicons-magnifying-glass-solid"
         >
           {{ $t('header.checkDomain', { returnObjects: true }) }}
         </UButton>
