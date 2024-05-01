@@ -27,7 +27,7 @@ dependencies:
     specifier: ^10.9.0
     version: 10.9.0(vue@3.4.21)
   nuxt:
-    specifier: ^3.11.1
+    specifier: ^3.11.2
     version: 3.11.2(@unocss/reset@0.59.4)(eslint@8.57.0)(floating-vue@5.2.2)(rollup@4.16.4)(typescript@5.4.5)(unocss@0.59.4)(vite@5.2.10)(vue-tsc@2.0.16)
 
 devDependencies:
