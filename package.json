@@ -13,29 +13,29 @@
     "typecheck": "nuxt typecheck"
   },
   "dependencies": {
-    "@iconify-json/circle-flags": "^1.1.47",
-    "@iconify-json/heroicons": "^1.1.21",
-    "@iconify-json/simple-icons": "^1.1.101",
-    "@nuxt/ui-pro": "^1.1.0",
-    "@nuxtjs/seo": "2.0.0-rc.10",
-    "@vueuse/core": "^10.9.0",
+    "@iconify-json/circle-flags": "^1.1.49",
+    "@iconify-json/heroicons": "^1.1.24",
+    "@iconify-json/simple-icons": "^1.1.112",
+    "@nuxt/ui-pro": "^1.4.1",
+    "@nuxtjs/seo": "2.0.0-rc.18",
+    "@vueuse/core": "^10.11.1",
     "nuxt": "^3.12.4"
   },
   "devDependencies": {
-    "@nuxt/devtools": "^1.2.0",
-    "@nuxt/eslint-config": "^0.3.10",
+    "@nuxt/devtools": "^1.3.7",
+    "@nuxt/eslint-config": "^0.5.0",
     "@nuxtjs/eslint-module": "^4.1.0",
-    "@nuxtjs/i18n": "^8.3.1",
-    "eslint": "^9.1.1",
+    "@nuxtjs/i18n": "^8.3.3",
+    "eslint": "^9.8.0",
     "nuxt-icon": "^0.6.10",
     "nuxt-security": "^1.4.3",
-    "vue-tsc": "^2.0.16",
-    "zod": "^3.23.5"
+    "vue-tsc": "^2.0.29",
+    "zod": "^3.23.8"
   },
   "resolutions": {
-    "vue": "3.4.26"
+    "vue": "3.4.35"
   },
   "overrides": {
-    "vue": "3.4.26"
+    "vue": "3.4.35"
   }
 }
