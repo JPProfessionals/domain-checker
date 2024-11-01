@@ -13,23 +13,23 @@
     "typecheck": "nuxt typecheck"
   },
   "dependencies": {
-    "@iconify-json/circle-flags": "^1.2.0",
-    "@iconify-json/heroicons": "^1.2.0",
-    "@iconify-json/simple-icons": "^1.2.5",
-    "@nuxt/ui-pro": "^1.4.3",
+    "@iconify-json/circle-flags": "^1.2.1",
+    "@iconify-json/heroicons": "^1.2.1",
+    "@iconify-json/simple-icons": "^1.2.10",
+    "@nuxt/ui-pro": "^1.4.4",
     "@nuxtjs/seo": "2.0.0-rc.23",
     "@vueuse/core": "^11.1.0",
     "nuxt": "^3.13.2"
   },
   "devDependencies": {
-    "@nuxt/devtools": "^1.5.1",
-    "@nuxt/eslint-config": "^0.5.7",
+    "@nuxt/devtools": "^1.6.0",
+    "@nuxt/eslint-config": "^0.6.1",
     "@nuxtjs/eslint-module": "^4.1.0",
     "@nuxtjs/i18n": "^8.5.5",
     "eslint": "^9.13.0",
     "nuxt-icon": "^0.6.10",
     "nuxt-security": "^2.0.0",
-    "vue-tsc": "^2.1.6",
+    "vue-tsc": "^2.1.10",
     "zod": "^3.23.8"
   }
 }
