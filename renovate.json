@@ -4,19 +4,18 @@
   "timezone": "Europe/Berlin",
   "packageRules": [
     {
-      "managers": ["npm"],
-      "updateTypes": ["patch"],
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["patch"],
       "automerge": true,
-      "automergeType": "branch",
-      "matchUpdateTypes": ["patch"]
+      "automergeType": "branch"
     },
     {
-      "managers": ["npm"],
+      "matchManagers": ["npm"],
       "assignees": ["omgitsjan"],
       "reviewers": ["omgitsjan"],
       "matchUpdateTypes": ["minor", "major", "patch"]
     }
   ],
-"schedule": ["before 11am on the first day of the month"],
+  "schedule": ["before 11am on the first day of the month"],
   "baseBranches": ["develop"]
 }
