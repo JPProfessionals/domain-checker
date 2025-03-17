@@ -1,27 +1,33 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   extends: ['@nuxt/ui-pro'],
+
   modules: [
     '@nuxt/ui',
     'nuxt-icon',
     'nuxt-security',
     '@nuxtjs/i18n',
-    '@nuxtjs/eslint-module',
     '@nuxtjs/seo',
+    '@nuxt/eslint',
   ],
+
   site: {
     url: 'https://domain.jpprofessionals.de',
     name: 'JPP\'s Domain Checker',
     description:
       'This is a streamlined open-source domain checker designed to quickly ascertain whether a domain is available or already in use, all without the annoyance of ads!',
   },
+
   ogImage: { enabled: false },
+
   ui: {
     icons: ['heroicons', 'simple-icons', 'circle-flags'],
   },
+
   devtools: {
     enabled: true,
   },
+
   i18n: {
     vueI18n: './i18n.config.ts',
     locales: [
@@ -36,6 +42,7 @@ export default defineNuxtConfig({
     ],
     defaultLocale: 'en',
   },
+
   security: {
     headers: {
       crossOriginEmbedderPolicy:
@@ -43,11 +50,13 @@ export default defineNuxtConfig({
       contentSecurityPolicy: false,
     },
   },
+
   nitro: {
     prerender: {
       autoSubfolderIndex: false
     }
   },
+
   routeRules: {
     '/api/*': {
       security: {
@@ -58,4 +67,6 @@ export default defineNuxtConfig({
       },
     },
   },
+
+  compatibilityDate: '2025-03-17',
 })
