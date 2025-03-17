@@ -17,5 +17,5 @@
     }
   ],
   "schedule": ["before 11am on the first day of the month"],
-  "baseBranches": ["develop"]
+  "baseBranches": ["main"]
 }
