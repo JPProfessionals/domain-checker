@@ -1,0 +1,54 @@
+name: Build and Push to Docker Hub
+
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-22.04
+    env:
+      NUXT_UI_PRO_LICENSE: ${{ secrets.NUXT_UI_PRO_LICENSE }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22.14'
+
+      - name: Install pnpm
+        run: npm install -g pnpm@9.x
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build project
+        run: pnpm run build
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
+      - name: Build Docker image
+        id: build-image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: false
+          tags: jpprofessionals/domain-checker:temp
+          outputs: type=image,name=jpprofessionals/domain-checker,push=false
+          build-args: |
+            NUXT_UI_PRO_LICENSE=${{ secrets.NUXT_UI_PRO_LICENSE }}
+
+      - name: Tag and push for release
+        run: |
+          TAG=${{ github.event.release.tag_name }}
+          docker tag jpprofessionals/domain-checker:temp jpprofessionals/domain-checker:latest
+          docker tag jpprofessionals/domain-checker:temp jpprofessionals/domain-checker:$TAG
+          docker push jpprofessionals/domain-checker:latest
+          docker push jpprofessionals/domain-checker:$TAG
