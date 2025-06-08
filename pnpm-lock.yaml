@@ -15,11 +15,11 @@ importers:
         specifier: ^1.2.2
         version: 1.2.2
       '@iconify-json/simple-icons':
-        specifier: ^1.2.36
-        version: 1.2.36
+        specifier: ^1.2.38
+        version: 1.2.38
       '@nuxt/ui-pro':
         specifier: ^1.8.0
-        version: 1.8.0(change-case@5.4.4)(jwt-decode@4.0.0)(magicast@0.3.5)(vite@6.3.5(@types/node@22.13.10)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.0))(vue@3.5.16(typescript@5.8.2))(zod@3.25.46)
+        version: 1.8.0(change-case@5.4.4)(jwt-decode@4.0.0)(magicast@0.3.5)(vite@6.3.5(@types/node@22.13.10)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.0))(vue@3.5.16(typescript@5.8.2))(zod@3.25.56)
       '@nuxtjs/seo':
         specifier: 3.0.3
         version: 3.0.3(@unhead/vue@2.0.10(vue@3.5.16(typescript@5.8.2)))(h3@1.15.3)(magicast@0.3.5)(rollup@4.41.1)(unstorage@1.16.0(@netlify/blobs@8.2.0)(db0@0.3.2)(ioredis@5.6.1))(vite@6.3.5(@types/node@22.13.10)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.0))(vue@3.5.16(typescript@5.8.2))
@@ -52,8 +52,8 @@ importers:
         specifier: ^2.2.10
         version: 2.2.10(typescript@5.8.2)
       zod:
-        specifier: ^3.25.46
-        version: 3.25.46
+        specifier: ^3.25.56
+        version: 3.25.56
 
 packages:
 
@@ -776,8 +776,8 @@ packages:
   '@iconify-json/heroicons@1.2.2':
     resolution: {integrity: sha512-qoW4pXr5kTTL6juEjgTs83OJIwpePu7q1tdtKVEdj+i0zyyVHgg/dd9grsXJQnpTpBt6/VwNjrXBvFjRsKPENg==}
 
-  '@iconify-json/simple-icons@1.2.36':
-    resolution: {integrity: sha512-ZMpVdoW/7hhbt2aHVSvudjH8eSVNNjKkAAjwAQHgiuPUiIfbvNakVin+H9uhUz4N9TbDT/nanzV/4Slb+6dDXw==}
+  '@iconify-json/simple-icons@1.2.38':
+    resolution: {integrity: sha512-mvMeFQgVjoHanQE9Q7ihmriEXAorjLZW+crUgQspDjFpzWuQp2RZMTppl1MN6TQztMVTsNFgF6LDKsp+v1RYRg==}
 
   '@iconify-json/vscode-icons@1.2.20':
     resolution: {integrity: sha512-xuWqr/SrckUoFi6kpSH/NrNGK+CuZ8LNnBY8qkRdkQvHmhirXvwsLfTKHoFndTsOlxfsHahlOLVCCb523kdqMA==}
@@ -5998,8 +5998,8 @@ packages:
     resolution: {integrity: sha512-zK7YHHz4ZXpW89AHXUPbQVGKI7uvkd3hzusTdotCg1UxyaVtg0zFJSTfW/Dq5f7OBBVnq6cZIaC8Ti4hb6dtCA==}
     engines: {node: '>= 14'}
 
-  zod@3.25.46:
-    resolution: {integrity: sha512-IqRxcHEIjqLd4LNS/zKffB3Jzg3NwqJxQQ0Ns7pdrvgGkwQsEBdEQcOHaBVqvvZArShRzI39+aMST3FBGmTrLQ==}
+  zod@3.25.56:
+    resolution: {integrity: sha512-rd6eEF3BTNvQnR2e2wwolfTmUTnp70aUTqr0oaGbHifzC3BKJsoV+Gat8vxUMR1hwOKBs6El+qWehrHbCpW6SQ==}
 
 snapshots:
 
@@ -6714,7 +6714,7 @@ snapshots:
     dependencies:
       '@iconify/types': 2.0.0
 
-  '@iconify-json/simple-icons@1.2.36':
+  '@iconify-json/simple-icons@1.2.38':
     dependencies:
       '@iconify/types': 2.0.0
 
@@ -7010,7 +7010,7 @@ snapshots:
       unixify: 1.0.0
       urlpattern-polyfill: 8.0.2
       yargs: 17.7.2
-      zod: 3.25.46
+      zod: 3.25.56
     transitivePeerDependencies:
       - encoding
       - rollup
@@ -7403,10 +7403,10 @@ snapshots:
     transitivePeerDependencies:
       - magicast
 
-  '@nuxt/ui-pro@1.8.0(change-case@5.4.4)(jwt-decode@4.0.0)(magicast@0.3.5)(vite@6.3.5(@types/node@22.13.10)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.0))(vue@3.5.16(typescript@5.8.2))(zod@3.25.46)':
+  '@nuxt/ui-pro@1.8.0(change-case@5.4.4)(jwt-decode@4.0.0)(magicast@0.3.5)(vite@6.3.5(@types/node@22.13.10)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.0))(vue@3.5.16(typescript@5.8.2))(zod@3.25.56)':
     dependencies:
       '@iconify-json/vscode-icons': 1.2.20
-      '@nuxt/ui': 2.22.0(change-case@5.4.4)(jwt-decode@4.0.0)(magicast@0.3.5)(vite@6.3.5(@types/node@22.13.10)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.0))(vue@3.5.16(typescript@5.8.2))(zod@3.25.46)
+      '@nuxt/ui': 2.22.0(change-case@5.4.4)(jwt-decode@4.0.0)(magicast@0.3.5)(vite@6.3.5(@types/node@22.13.10)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.0))(vue@3.5.16(typescript@5.8.2))(zod@3.25.56)
       '@vueuse/core': 13.1.0(vue@3.5.16(typescript@5.8.2))
       defu: 6.1.4
       git-url-parse: 16.1.0
@@ -7438,7 +7438,7 @@ snapshots:
       - yup
       - zod
 
-  '@nuxt/ui@2.22.0(change-case@5.4.4)(jwt-decode@4.0.0)(magicast@0.3.5)(vite@6.3.5(@types/node@22.13.10)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.0))(vue@3.5.16(typescript@5.8.2))(zod@3.25.46)':
+  '@nuxt/ui@2.22.0(change-case@5.4.4)(jwt-decode@4.0.0)(magicast@0.3.5)(vite@6.3.5(@types/node@22.13.10)(jiti@2.4.2)(terser@5.39.0)(yaml@2.7.0))(vue@3.5.16(typescript@5.8.2))(zod@3.25.56)':
     dependencies:
       '@headlessui/tailwindcss': 0.2.2(tailwindcss@3.4.17)
       '@headlessui/vue': 1.7.23(vue@3.5.16(typescript@5.8.2))
@@ -7464,7 +7464,7 @@ snapshots:
       tailwind-merge: 2.6.0
       tailwindcss: 3.4.17
     optionalDependencies:
-      zod: 3.25.46
+      zod: 3.25.56
     transitivePeerDependencies:
       - async-validator
       - axios
@@ -12916,4 +12916,4 @@ snapshots:
       compress-commons: 6.0.2
       readable-stream: 4.7.0
 
-  zod@3.25.46: {}
+  zod@3.25.56: {}
