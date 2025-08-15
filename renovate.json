@@ -14,8 +14,30 @@
       "assignees": ["omgitsjan"],
       "reviewers": ["omgitsjan"],
       "matchUpdateTypes": ["minor", "major", "patch"]
+    },
+    {
+      "description": "Lockfile refresh every 3 months - no PR creation",
+      "matchFileNames": ["package-lock.json", "yarn.lock", "pnpm-lock.yaml"],
+      "schedule": ["on the 1st day of every 3 months"],
+      "recreateWhen": "always",
+      "rebaseWhen": "behind-base-branch",
+      "platformAutomerge": false,
+      "automerge": false,
+      "dependencyDashboard": false,
+      "prCreation": "not-pending",
+      "lockFileMaintenance": {
+        "enabled": true,
+        "recreateWhen": "always"
+      }
     }
   ],
   "schedule": ["before 11am on the first day of the month"],
-  "baseBranches": ["main"]
+  "baseBranches": ["main"],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["on the 1st day of every 3 months"],
+    "recreateWhen": "always",
+    "prCreation": "not-pending",
+    "automerge": false
+  }
 }
