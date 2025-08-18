@@ -18,7 +18,7 @@
     {
       "description": "Lockfile refresh every 3 months - no PR creation",
       "matchFileNames": ["package-lock.json", "yarn.lock", "pnpm-lock.yaml"],
-      "schedule": ["on the 1st day of every 3 months"],
+      "schedule": ["* * 1 */3 *"],
       "recreateWhen": "always",
       "rebaseWhen": "behind-base-branch",
       "platformAutomerge": false,
@@ -35,7 +35,7 @@
   "baseBranches": ["main"],
   "lockFileMaintenance": {
     "enabled": true,
-    "schedule": ["on the 1st day of every 3 months"],
+    "schedule": ["* * 1 */3 *"],
     "recreateWhen": "always",
     "prCreation": "not-pending",
     "automerge": false
