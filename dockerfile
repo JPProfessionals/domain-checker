@@ -1,5 +1,5 @@
 # Build stage
-FROM node:22.17.0-slim AS build
+FROM node:24.11.0-slim AS build
 WORKDIR /app
 
 # Install pnpm
@@ -24,7 +24,7 @@ COPY . .
 RUN pnpm run build
 
 # Production stage
-FROM node:22.17.0-slim
+FROM node:24.11.0-slim
 WORKDIR /app
 
 # Copy the build output from the build stage
