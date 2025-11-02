@@ -1,0 +1,45 @@
+# Nuxt dev/build outputs
+.output
+.data
+.nuxt
+.nitro
+.cache
+dist
+
+# Node dependencies (will be installed in container)
+node_modules
+
+# Logs
+logs
+*.log
+
+# Misc
+.DS_Store
+.fleet
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# Local env files (should be set via build args or env vars)
+.env
+.env.*
+.env.example
+
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+*.md
+
+# Docker files (don't copy docker files into themselves)
+dockerfile
+.dockerignore
+
+# CI/CD
+.github
+.gitlab-ci.yml
+renovate.json

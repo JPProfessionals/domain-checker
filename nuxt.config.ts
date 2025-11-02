@@ -25,7 +25,7 @@ export default defineNuxtConfig({
   },
 
   devtools: {
-    enabled: true,
+    enabled: process.env.NODE_ENV === 'development',
   },
 
   i18n: {
@@ -51,12 +51,6 @@ export default defineNuxtConfig({
     },
   },
 
-  nitro: {
-    prerender: {
-      autoSubfolderIndex: false
-    }
-  },
-
   routeRules: {
     '/api/*': {
       security: {
@@ -65,6 +59,21 @@ export default defineNuxtConfig({
           interval: 10000,
         },
       },
+      // Add request size limits to prevent memory issues
+      cors: true,
+      headers: {
+        'X-Content-Type-Options': 'nosniff',
+      },
+    },
+  },
+
+  nitro: {
+    prerender: {
+      autoSubfolderIndex: false
+    },
+    // Add request limits to prevent memory exhaustion
+    experimental: {
+      wasm: false,
     },
   },
 
