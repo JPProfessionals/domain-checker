@@ -45,7 +45,7 @@ export default defineI18nConfig(() => ({
       },
 
       notifications: {
-        errorGeneral:
+        generalError:
           'Failed to check domain availability, please try again later.',
       },
 

@@ -31,11 +31,11 @@ const search = ref('')
 const filteredTlds = computed(() => {
   return fetchedTLDs.value.filter((i) =>
     i.includes(search.value.toLowerCase())
-  ) as any[]
+  )
 })
 
 const { list, containerProps, wrapperProps } = useVirtualList(filteredTlds, {
-  itemHeight: (i) => filteredTlds.value[i].height + 8,
+  itemHeight: 40, // Fixed height for each TLD item (padding + content)
   overscan: 10,
 })
 
@@ -43,10 +43,11 @@ const { list, containerProps, wrapperProps } = useVirtualList(filteredTlds, {
 const schema = z.object({
   search: z
     .string()
-    .min(3, t('schema.searchMin', { returnObjects: true }))
+    .min(3, t('schema.searchMin'))
+    .max(63, t('schema.searchMax') || 'Domain name too long (max 63 characters)')
     .regex(
       /^[a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?$/,
-      t('schema.searchRegex', { returnObjects: true })
+      t('schema.searchRegex')
     ),
 })
 
@@ -86,18 +87,21 @@ function toggleTldPicker() {
   search.value = ''
 }
 
-async function fetchTLDs(input: any = null): Promise<string[]> {
+async function fetchTLDs(input: string | null = null): Promise<string[]> {
   const { data, error: fetchError } = await useAsyncData('tlds', () =>
-    $fetch('/api/getTlds', {
+    $fetch<string[]>('/api/getTlds', {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ input: input ?? '', pageSize: -1 }),
+      body: JSON.stringify({ 
+        input: input ?? '', 
+        pageSize: 500 // Reasonable limit instead of unlimited
+      }),
     })
   )
 
   if (fetchError.value || !data.value) {
     console.error(
-      t('notifications.generalError', { returnObjects: true }),
+      t('notifications.generalError'),
       fetchError.value
     )
     return defaultTlds
@@ -131,7 +135,7 @@ async function checkDomains() {
     })
   )
   if (fetchError.value) {
-    error.value = t('notifications.generalError', { returnObjects: true })
+    error.value = t('notifications.generalError')
     loading.value = false
     return
   }
@@ -164,8 +168,8 @@ function openLinkModal(domain: string) {
 <template>
   <div class="mb-6">
     <ULandingHero
-      :title="$t('header.title', { returnObjects: true })"
-      :description="$t('header.subTitle', { returnObjects: true })"
+      :title="$t('header.title')"
+      :description="$t('header.subTitle')"
     >
       <template #links>
         <UButton
@@ -173,7 +177,7 @@ function openLinkModal(domain: string) {
           size="lg"
           icon="i-heroicons-magnifying-glass-solid"
         >
-          {{ $t('header.checkDomain', { returnObjects: true }) }}
+          {{ $t('header.checkDomain') }}
         </UButton>
         <UButton
           to="https://github.com/jpprofessionals/domain-checker"
@@ -182,16 +186,16 @@ function openLinkModal(domain: string) {
           color="gray"
           icon="i-heroicons-cube-transparent"
         >
-          {{ $t('header.openSourceRepo', { returnObjects: true }) }}
+          {{ $t('header.openSourceRepo') }}
         </UButton>
       </template>
     </ULandingHero>
 
     <UContainer id="search">
       <UPageHeader
-        :headline="$t('search.headline', { returnObjects: true })"
-        :title="$t('search.title', { returnObjects: true })"
-        :description="$t('search.description', { returnObjects: true })"
+        :headline="$t('search.headline')"
+        :title="$t('search.title')"
+        :description="$t('search.description')"
         class="pb-4 pt-0"
       >
         <UForm
@@ -204,7 +208,7 @@ function openLinkModal(domain: string) {
           <div class="flex flex-wrap -mx-3">
             <div class="w-full sm:w-3/4 px-3">
               <UFormGroup
-                :label="$t('search.form.inputLabel', { returnObjects: true })"
+                :label="$t('search.form.inputLabel')"
                 name="search"
                 class="mb-6"
               >
@@ -216,11 +220,7 @@ function openLinkModal(domain: string) {
                   color="primary"
                   variant="outline"
                   size="xl"
-                  :placeholder="
-                    $t('search.form.inputPlaceholder', {
-                      returnObjects: true,
-                    })
-                  "
+                  :placeholder="$t('search.form.inputPlaceholder')"
                   :autofocus="false"
                   :required="true"
                   :ui="{ icon: { trailing: { pointer: '' } } }"
@@ -238,11 +238,7 @@ function openLinkModal(domain: string) {
             </div>
             <div class="w-full sm:w-1/4 px-3">
               <UFormGroup
-                :label="
-                  $t('search.form.selectMenuLabel', {
-                    returnObjects: true,
-                  })
-                "
+                :label="$t('search.form.selectMenuLabel')"
                 name="tlds"
                 class="mb-6"
               >
@@ -268,9 +264,7 @@ function openLinkModal(domain: string) {
                       {{
                         formState.selectedTLDs.length +
                         ' ' +
-                        $t('search.form.selectMenuSelectedLabel', {
-                          returnObjects: true,
-                        })
+                        $t('search.form.selectMenuSelectedLabel')
                       }}
                     </UButton>
                     <UButton
@@ -299,13 +293,9 @@ function openLinkModal(domain: string) {
                         name="search"
                         variant="outline"
                         size="xl"
-                        :placeholder="
-                          $t('search.form.selectMenuPlaceholder', {
-                            returnObjects: true,
-                          })
-                        "
+                        :placeholder="$t('search.form.selectMenuPlaceholder')"
                         :autofocus="true"
-                        autofocusDelay="400"
+                        :autofocusDelay="400"
                       >
                       </UInput>
 
@@ -318,9 +308,6 @@ function openLinkModal(domain: string) {
                             v-for="{ index, data } in list"
                             :key="index"
                             class="p-2 mt-2 flex space-x-2 justify-center items-center"
-                            :style="{
-                              height: `${data.height}px`,
-                            }"
                             @click="selectTld(data)"
                           >
                             <div
@@ -367,7 +354,7 @@ function openLinkModal(domain: string) {
         />
       </div>
 
-      <div d="resultCards" class="grid grid-cols-2 gap-4 mt-8">
+      <div id="resultCards" class="grid grid-cols-2 gap-4 mt-8">
         <ULandingCard
           v-for="result in domainsResults.domains"
           :key="result.id"
@@ -394,11 +381,9 @@ function openLinkModal(domain: string) {
           "
           :description="
             result.available
-              ? $t('result.domainAvailable', { returnObjects: true })
-              : $t('result.domainUsed', { returnObjects: true })
+              ? $t('result.domainAvailable')
+              : $t('result.domainUsed')
           "
-          :to="!result.available ? 'OpenModal' : null"
-          target="_blank"
           @click.prevent.stop="
             !result.available ? openLinkModal(result.domain) : null
           "
@@ -418,7 +403,7 @@ function openLinkModal(domain: string) {
             <h3
               class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
             >
-              {{ $t('modal.headline', { returnObjects: true }) }}
+              {{ $t('modal.headline') }}
             </h3>
             <UButton
               color="gray"
@@ -430,8 +415,8 @@ function openLinkModal(domain: string) {
           </div>
         </template>
         <UPageCard
-          :title="$t('modal.title', { returnObjects: true })"
-          :description="$t('modal.subTitle', { returnObjects: true })"
+          :title="$t('modal.title')"
+          :description="$t('modal.subTitle')"
           icon="i-heroicons-exclamation-triangle"
           class="mb-4"
           :ui="{
@@ -444,7 +429,7 @@ function openLinkModal(domain: string) {
 
         <UButton
           block
-          :label="$t('modal.button', { returnObjects: true })"
+          :label="$t('modal.button')"
           icon="i-heroicons-link"
           :to="currentLink"
           target="_blank"

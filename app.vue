@@ -3,30 +3,30 @@ const { t } = useI18n()
 
 const links = computed(() => [
   {
-    label: t('global.homepage', { returnObjects: true }),
+    label: t('global.homepage'),
     to: 'https://jpprofessionals.de/',
     target: '_blank',
   },
   {
-    label: t('global.imprint', { returnObjects: true }),
+    label: t('global.imprint'),
     to: 'https://jpprofessionals.de/impressum',
     target: '_blank',
   },
   {
-    label: t('global.privacyPolicy', { returnObjects: true }),
+    label: t('global.privacyPolicy'),
     to: 'https://jpprofessionals.de/privacy-policy',
     target: '_blank',
   },
 ])
 
 useHead({
-  title: t('global.seoTitle', { returnObjects: true }),
+  title: t('global.seoTitle'),
   meta: [{ name: 'viewport', content: 'width=device-width, initial-scale=1' }],
   link: [{ rel: 'icon', href: '/favicon.ico' }],
 })
 
 useSeoMeta({
-  description: t('global.seoDescription', { returnObjects: true }),
+  description: t('global.seoDescription'),
 })
 
 const { locale, locales } = useI18n()
