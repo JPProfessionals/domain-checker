@@ -2,42 +2,37 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["@nuxtjs", "config:recommended", ":dependencyDashboard"],
   "timezone": "Europe/Berlin",
+  "schedule": ["before 11am on the first day of the month"],
+  "baseBranches": ["main"],
   "packageRules": [
     {
+      "description": "Automerge patch updates",
       "matchManagers": ["npm"],
       "matchUpdateTypes": ["patch"],
       "automerge": true,
       "automergeType": "branch"
     },
     {
+      "description": "Group all minor updates into one PR",
       "matchManagers": ["npm"],
+      "matchUpdateTypes": ["minor"],
+      "groupName": "all minor dependencies",
       "assignees": ["omgitsjan"],
-      "reviewers": ["omgitsjan"],
-      "matchUpdateTypes": ["minor", "major", "patch"]
+      "reviewers": ["omgitsjan"]
     },
     {
-      "description": "Lockfile refresh every 3 months - no PR creation",
-      "matchFileNames": ["package-lock.json", "yarn.lock", "pnpm-lock.yaml"],
-      "schedule": ["* * 1 */3 *"],
-      "recreateWhen": "always",
-      "rebaseWhen": "behind-base-branch",
-      "platformAutomerge": false,
-      "automerge": false,
-      "dependencyDashboard": false,
-      "prCreation": "not-pending",
-      "lockFileMaintenance": {
-        "enabled": true,
-        "recreateWhen": "always"
-      }
+      "description": "Group all major updates into one PR",
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "all major dependencies",
+      "assignees": ["omgitsjan"],
+      "reviewers": ["omgitsjan"]
     }
   ],
-  "schedule": ["before 11am on the first day of the month"],
-  "baseBranches": ["main"],
   "lockFileMaintenance": {
     "enabled": true,
     "schedule": ["* * 1 */3 *"],
     "recreateWhen": "always",
-    "prCreation": "not-pending",
     "automerge": false
   }
 }
