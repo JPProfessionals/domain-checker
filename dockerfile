@@ -1,5 +1,5 @@
 # Build stage
-FROM node:24.11.0-slim AS build
+FROM node:24.11.1-slim AS build
 WORKDIR /app
 
 # Install pnpm
@@ -24,7 +24,7 @@ COPY . .
 RUN pnpm run build
 
 # Production stage
-FROM node:24.11.0-slim
+FROM node:24.11.1-slim
 WORKDIR /app
 
 # Set Node.js memory limits to prevent OOM
