@@ -1,0 +1,11 @@
+# Robots.txt for JPP's Domain Checker
+# https://domain.jpprofessionals.de
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://domain.jpprofessionals.de/sitemap.xml
+
+# Block API endpoints from crawling
+Disallow: /api/

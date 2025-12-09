@@ -27,6 +27,9 @@ RUN pnpm run build
 FROM node:24.11.0-slim
 WORKDIR /app
 
+# Set Node.js memory limits to prevent OOM
+ENV NODE_OPTIONS="--max-old-space-size=512"
+
 # Copy the build output from the build stage
 COPY --from=build /app/.output ./
 

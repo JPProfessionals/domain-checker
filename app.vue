@@ -1,5 +1,7 @@
 <script setup>
 const { t } = useI18n()
+const { locale, locales } = useI18n()
+const switchLocalePath = useSwitchLocalePath()
 
 const links = computed(() => [
   {
@@ -19,18 +21,59 @@ const links = computed(() => [
   },
 ])
 
+// Structured Data (JSON-LD) for SEO
+const structuredData = computed(() => ({
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'JPP\'s Domain Checker',
+  description: t('global.seoDescription'),
+  url: 'https://domain.jpprofessionals.de',
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Any',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'EUR',
+  },
+  author: {
+    '@type': 'Organization',
+    name: 'JPProfessionals',
+    url: 'https://jpprofessionals.de',
+  },
+  inLanguage: [locale.value],
+  isAccessibleForFree: true,
+}))
+
 useHead({
   title: t('global.seoTitle'),
-  meta: [{ name: 'viewport', content: 'width=device-width, initial-scale=1' }],
-  link: [{ rel: 'icon', href: '/favicon.ico' }],
+  meta: [
+    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+    { name: 'theme-color', content: '#14b8a6' },
+    { name: 'author', content: 'JPProfessionals' },
+    { name: 'robots', content: 'index, follow' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:site_name', content: 'JPP\'s Domain Checker' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+  ],
+  link: [
+    { rel: 'icon', href: '/favicon.ico' },
+    { rel: 'manifest', href: '/site.webmanifest' },
+    { rel: 'preconnect', href: 'https://api.ote-godaddy.com' },
+  ],
+  htmlAttrs: {
+    lang: locale.value,
+  },
+  script: [
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify(structuredData.value),
+    },
+  ],
 })
 
 useSeoMeta({
   description: t('global.seoDescription'),
 })
-
-const { locale, locales } = useI18n()
-const switchLocalePath = useSwitchLocalePath()
 
 const availableLocales = computed(() => {
   return locales.value.filter((i) => i.code !== locale.value)

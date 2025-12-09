@@ -1,11 +1,10 @@
 <script setup lang="ts">
-// 1. Imports
-import { ref, reactive } from 'vue'
+// 1. Imports - Nuxt auto-imports ref, reactive, computed, etc.
 import { z } from 'zod'
-import { useI18n } from '#imports'
 import type { FormSubmitEvent } from '#ui/types'
-import type { DomainResult, DomainsResult } from '../types/domain'
+import type { DomainResult, DomainsResult, TldType } from '../types/domain'
 import { useVirtualList } from '@vueuse/core'
+import tldData from '../data/tlds.json'
 
 // 2. Reactive States and Refs
 const defaultTlds = ['.com', '.net', '.org', '.de']
@@ -20,6 +19,12 @@ const currentLink = ref('')
 const open = ref(false)
 const popover = ref<null | HTMLElement>(null)
 
+// TLD Type filter state
+const tldTypeFilter = ref<'all' | TldType>('all')
+
+// Keyboard navigation state
+const focusedTldIndex = ref(-1)
+
 const formState = reactive({
   search: '',
   selectedTLDs: defaultTlds,
@@ -28,10 +33,23 @@ const formState = reactive({
 const fetchedTLDs = ref([] as string[])
 const search = ref('')
 
+// Get TLD type from static data
+const getTldType = (tldName: string): TldType | null => {
+  const tld = tldData.tlds.find((t) => t.name === tldName)
+  return (tld?.type as TldType) ?? null
+}
+
 const filteredTlds = computed(() => {
-  return fetchedTLDs.value.filter((i) =>
+  let filtered = fetchedTLDs.value.filter((i) =>
     i.includes(search.value.toLowerCase())
   )
+
+  // Apply type filter
+  if (tldTypeFilter.value !== 'all') {
+    filtered = filtered.filter((tld) => getTldType(tld) === tldTypeFilter.value)
+  }
+
+  return filtered
 })
 
 const { list, containerProps, wrapperProps } = useVirtualList(filteredTlds, {
@@ -44,11 +62,11 @@ const schema = z.object({
   search: z
     .string()
     .min(3, t('schema.searchMin'))
-    .max(63, t('schema.searchMax') || 'Domain name too long (max 63 characters)')
-    .regex(
-      /^[a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?$/,
-      t('schema.searchRegex')
-    ),
+    .max(
+      63,
+      t('schema.searchMax') || 'Domain name too long (max 63 characters)'
+    )
+    .regex(/^[a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?$/, t('schema.searchRegex')),
 })
 
 // 4. Lifecycle Hooks
@@ -66,6 +84,50 @@ defineShortcuts({
     toggleTldPicker()
   },
 })
+
+// Keyboard navigation handler
+function handleTldKeydown(event: KeyboardEvent) {
+  const listLength = filteredTlds.value.length
+
+  switch (event.key) {
+    case 'ArrowDown':
+      event.preventDefault()
+      focusedTldIndex.value = Math.min(
+        focusedTldIndex.value + 1,
+        listLength - 1
+      )
+      break
+    case 'ArrowUp':
+      event.preventDefault()
+      focusedTldIndex.value = Math.max(focusedTldIndex.value - 1, 0)
+      break
+    case 'Enter':
+    case ' ':
+      event.preventDefault()
+      if (focusedTldIndex.value >= 0 && focusedTldIndex.value < listLength) {
+        selectTld(filteredTlds.value[focusedTldIndex.value])
+      }
+      break
+    case 'Escape':
+      open.value = false
+      break
+  }
+}
+
+// Select/Deselect all visible TLDs
+function selectAllTlds() {
+  const tldsToAdd = filteredTlds.value.filter(
+    (tld) => !formState.selectedTLDs.includes(tld)
+  )
+  formState.selectedTLDs = [...formState.selectedTLDs, ...tldsToAdd]
+}
+
+function deselectAllTlds() {
+  const filteredSet = new Set(filteredTlds.value)
+  formState.selectedTLDs = formState.selectedTLDs.filter(
+    (tld) => !filteredSet.has(tld)
+  )
+}
 
 function toggleTldPicker() {
   fetchedTLDs.value = fetchedTLDs.value.sort((a, b) => {
@@ -85,29 +147,38 @@ function toggleTldPicker() {
   }, 200)
 
   search.value = ''
+  focusedTldIndex.value = -1
 }
 
 async function fetchTLDs(input: string | null = null): Promise<string[]> {
-  const { data, error: fetchError } = await useAsyncData('tlds', () =>
-    $fetch<string[]>('/api/getTlds', {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        input: input ?? '', 
-        pageSize: 500 // Reasonable limit instead of unlimited
-      }),
-    })
-  )
-
-  if (fetchError.value || !data.value) {
-    console.error(
-      t('notifications.generalError'),
-      fetchError.value
+  try {
+    const { data, error: fetchError } = await useAsyncData(
+      'tlds',
+      () =>
+        $fetch<string[]>('/api/getTlds', {
+          method: 'post',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            input: input ?? '',
+            pageSize: 500, // Load all TLDs, virtual list handles rendering
+          }),
+        }),
+      {
+        server: false, // Client-side only to reduce SSR memory
+        lazy: true,
+      }
     )
+
+    if (fetchError.value || !data.value) {
+      console.error('TLD fetch error:', fetchError.value)
+      return defaultTlds
+    }
+
+    return data.value
+  } catch (e) {
+    console.error('TLD fetch failed:', e)
     return defaultTlds
   }
-
-  return data.value
 }
 
 function selectTld(data: string) {
@@ -122,30 +193,44 @@ function selectTld(data: string) {
 }
 
 async function checkDomains() {
+  // Reset error state before new request
+  error.value = ''
   loading.value = true
+
+  // Clear previous results to free memory
+  domainsResults.value = { domains: [] }
+
   const requestBody = {
     domain: formState.search,
     tlds: formState.selectedTLDs,
   }
-  const { data, error: fetchError } = await useAsyncData('domains', () =>
-    $fetch('/api/checkDomains', {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestBody),
-    })
-  )
-  if (fetchError.value) {
+
+  try {
+    const { data, error: fetchError } = await useAsyncData('domains', () =>
+      $fetch('/api/checkDomains', {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody),
+      })
+    )
+
+    if (fetchError.value) {
+      error.value = t('notifications.generalError')
+      return
+    }
+
+    if (data.value) {
+      domainsResults.value = data.value as DomainsResult
+    }
+  } catch (e) {
+    console.error('Domain check failed:', e)
     error.value = t('notifications.generalError')
+  } finally {
     loading.value = false
-    return
   }
-  if (data.value) {
-    domainsResults.value = data.value as DomainsResult
-  }
-  loading.value = false
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 async function onSubmit(_event: FormSubmitEvent<z.output<typeof schema>>) {
   await checkDomains()
 }
@@ -155,15 +240,6 @@ function openLinkModal(domain: string) {
   isOpen.value = true
 }
 </script>
-
-<style scoped>
-:deep(.popover-container) {
-  inset: unset !important;
-  transform: unset !important;
-  width: 100%;
-  margin-top: 8px !important;
-}
-</style>
 
 <template>
   <div class="mb-6">
@@ -243,8 +319,8 @@ function openLinkModal(domain: string) {
                 class="mb-6"
               >
                 <UPopover
-                  overlay
                   v-model:open="open"
+                  overlay
                   :popper="{ arrow: true }"
                   :ui="{
                     container: 'z-50 popover-container group',
@@ -286,7 +362,9 @@ function openLinkModal(domain: string) {
                       ref="popover"
                       class="w-full border border-[rgb(var(--color-primary-400))] rounded"
                       style="background-color: rgb(var(--ui-background))"
+                      @keydown="handleTldKeydown"
                     >
+                      <!-- Search Input -->
                       <UInput
                         v-model="search"
                         class="p-2"
@@ -295,36 +373,98 @@ function openLinkModal(domain: string) {
                         size="xl"
                         :placeholder="$t('search.form.selectMenuPlaceholder')"
                         :autofocus="true"
-                        :autofocusDelay="400"
-                      >
-                      </UInput>
+                        :autofocus-delay="400"
+                      />
 
+                      <!-- TLD Type Filter Buttons -->
+                      <div class="flex gap-1 px-2 pb-2">
+                        <UButton
+                          size="xs"
+                          :variant="
+                            tldTypeFilter === 'all' ? 'solid' : 'outline'
+                          "
+                          @click="tldTypeFilter = 'all'"
+                        >
+                          {{ $t('tldFilter.all') }}
+                        </UButton>
+                        <UButton
+                          size="xs"
+                          :variant="
+                            tldTypeFilter === 'GENERIC' ? 'solid' : 'outline'
+                          "
+                          @click="tldTypeFilter = 'GENERIC'"
+                        >
+                          {{ $t('tldFilter.generic') }}
+                        </UButton>
+                        <UButton
+                          size="xs"
+                          :variant="
+                            tldTypeFilter === 'COUNTRY_CODE'
+                              ? 'solid'
+                              : 'outline'
+                          "
+                          @click="tldTypeFilter = 'COUNTRY_CODE'"
+                        >
+                          {{ $t('tldFilter.country') }}
+                        </UButton>
+                      </div>
+
+                      <!-- Select All / Deselect All -->
+                      <div
+                        class="flex gap-2 px-2 pb-2 border-b border-gray-200 dark:border-gray-700"
+                      >
+                        <UButton
+                          size="xs"
+                          variant="ghost"
+                          icon="i-heroicons-check-circle"
+                          @click="selectAllTlds"
+                        >
+                          {{ $t('tldFilter.selectAll') }}
+                        </UButton>
+                        <UButton
+                          size="xs"
+                          variant="ghost"
+                          icon="i-heroicons-x-circle"
+                          @click="deselectAllTlds"
+                        >
+                          {{ $t('tldFilter.deselectAll') }}
+                        </UButton>
+                      </div>
+
+                      <!-- TLD List with Virtual Scrolling -->
                       <div
                         v-bind="containerProps"
                         class="h-64 pt-0 overflow-auto p-2"
+                        role="listbox"
+                        tabindex="0"
                       >
                         <div v-bind="wrapperProps">
                           <div
                             v-for="{ index, data } in list"
                             :key="index"
-                            class="p-2 mt-2 flex space-x-2 justify-center items-center"
+                            role="option"
+                            :aria-selected="
+                              formState.selectedTLDs.includes(data)
+                            "
+                            class="p-2 mt-2 flex space-x-2 justify-center items-center cursor-pointer rounded transition-colors"
+                            :class="[
+                              formState.selectedTLDs.includes(data)
+                                ? 'text-[rgb(var(--color-primary-400))] bg-primary-50 dark:bg-primary-900/20'
+                                : 'hover:bg-gray-100 dark:hover:bg-gray-800',
+                              focusedTldIndex === index
+                                ? 'ring-2 ring-primary-400'
+                                : '',
+                            ]"
                             @click="selectTld(data)"
                           >
-                            <div
-                              class="flex flex-1 cursor-pointer"
-                              :class="
-                                formState.selectedTLDs.includes(data)
-                                  ? 'text-[rgb(var(--color-primary-400))]'
-                                  : ''
-                              "
-                            >
+                            <div class="flex flex-1">
                               {{ data }}
                             </div>
                             <div class="flex">
                               <Icon
+                                v-if="formState.selectedTLDs.includes(data)"
                                 class="text-[rgb(var(--color-primary-400))]"
                                 name="material-symbols:check"
-                                v-if="formState.selectedTLDs.includes(data)"
                               />
                             </div>
                           </div>
@@ -439,3 +579,12 @@ function openLinkModal(domain: string) {
     </UModal>
   </div>
 </template>
+
+<style scoped>
+:deep(.popover-container) {
+  inset: unset !important;
+  transform: unset !important;
+  width: 100%;
+  margin-top: 8px !important;
+}
+</style>

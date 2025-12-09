@@ -53,6 +53,14 @@ export default defineI18nConfig(() => ({
         searchMin: 'Must be at least 3 characters long',
         searchRegex: 'Must be a valid domain name without TLD',
       },
+
+      tldFilter: {
+        all: 'All TLDs',
+        generic: 'Generic',
+        country: 'Country',
+        selectAll: 'Select all',
+        deselectAll: 'Deselect all',
+      },
     },
 
     de: {
@@ -97,13 +105,22 @@ export default defineI18nConfig(() => ({
         subTitle: 'Du verlässt diese Seite zu einer unbekannten externen Domain!',
         button: 'Ich verstehe, bitte leite mich weiter...',
       },
-      notifications: {
+      notifications:
+        {
         generalError:
           'Fehler beim Überprüfen der Domainverfügbarkeit, bitte versuche es später erneut.',
       },
       schema: {
         searchMin: 'Muss mindestens 3 Zeichen lang sein',
         searchRegex: 'Muss ein gültiger Domainname ohne TLD sein',
+      },
+
+      tldFilter: {
+        all: 'Alle TLDs',
+        generic: 'Generisch',
+        country: 'Länder',
+        selectAll: 'Alle auswählen',
+        deselectAll: 'Alle abwählen',
       },
     },
   },

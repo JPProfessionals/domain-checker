@@ -2,16 +2,16 @@
 
 export interface DomainResult {
   id?: string;
-  available: boolean,
-  currency: string,
-  definitive: boolean,
-  domain: string,
-  period: number,
-  price: number
+  available: boolean;
+  currency: string;
+  definitive: boolean;
+  domain: string;
+  period: number;
+  price: number;
 }
 
-export interface DomainsResult{
-  domains: DomainResult[]
+export interface DomainsResult {
+  domains: DomainResult[];
 }
 
 export interface DomainError {
@@ -22,7 +22,21 @@ export interface DomainError {
   status: 0;
 }
 
-// API Request/Response types
+// TLD Types
+export type TldType = 'GENERIC' | 'COUNTRY_CODE';
+
+export interface Tld {
+  name: string;
+  type: TldType;
+}
+
+export interface TldData {
+  tlds: Tld[];
+  lastUpdated: string;
+  totalCount: number;
+}
+
+// API Request/Response types (Legacy - will be removed when Directus is removed)
 export interface TldApiResponse {
   data: Array<{ name: string }>;
 }
@@ -30,6 +44,7 @@ export interface TldApiResponse {
 export interface GetTldsRequestBody {
   input?: string;
   pageSize?: number;
+  type?: TldType; // Filter by TLD type
 }
 
 export interface CheckDomainsRequestBody {
