@@ -22,12 +22,12 @@
     "nuxt": "^4.2.1"
   },
   "devDependencies": {
-    "@nuxt/devtools": "^2.7.0",
+    "@nuxt/devtools": "^3.1.1",
     "@nuxt/eslint": "^1.11.0",
     "@nuxtjs/i18n": "^10.2.1",
     "eslint": "^9.39.1",
     "nuxt-security": "^2.5.0",
-    "vue-tsc": "^2.2.12",
-    "zod": "^3.25.76"
+    "vue-tsc": "^3.1.8",
+    "zod": "^4.1.13"
   }
 }
