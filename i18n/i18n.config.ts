@@ -30,7 +30,7 @@ export default defineI18nConfig(() => ({
           selectMenuPlaceholder: 'Select TLDs',
           selectMenuSearchablePlaceholder: 'Search TLDs...',
           selectMenuSelectedLabel: 'selected',
-          selectMenuSelectedLabelEmpty: 'Select TLDs...',
+          selectMenuSelectedLabelEmpty: 'Select a TLD',
         },
       },
       result: {
@@ -45,12 +45,14 @@ export default defineI18nConfig(() => ({
       },
 
       notifications: {
+        errorTitle: 'Error',
         generalError:
           'Failed to check domain availability, please try again later.',
       },
 
       schema: {
         searchMin: 'Must be at least 3 characters long',
+        searchMax: 'Domain name too long (max 63 characters)',
         searchRegex: 'Must be a valid domain name without TLD',
       },
 
@@ -92,7 +94,7 @@ export default defineI18nConfig(() => ({
           selectMenuPlaceholder: 'TLDs auswählen',
           selectMenuSearchablePlaceholder: 'TLDs suchen...',
           selectMenuSelectedLabel: 'ausgewählt',
-          selectMenuSelectedLabelEmpty: 'TLDs auswählen...',
+          selectMenuSelectedLabelEmpty: 'Wähle eine TLD aus',
         },
       },
       result: {
@@ -107,11 +109,13 @@ export default defineI18nConfig(() => ({
       },
       notifications:
         {
+        errorTitle: 'Fehler',
         generalError:
           'Fehler beim Überprüfen der Domainverfügbarkeit, bitte versuche es später erneut.',
       },
       schema: {
         searchMin: 'Muss mindestens 3 Zeichen lang sein',
+        searchMax: 'Domainname zu lang (max. 63 Zeichen)',
         searchRegex: 'Muss ein gültiger Domainname ohne TLD sein',
       },
 

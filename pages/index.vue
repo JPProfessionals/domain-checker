@@ -3,7 +3,6 @@
 import { z } from 'zod'
 import type { FormSubmitEvent } from '#ui/types'
 import type { DomainResult, DomainsResult, TldType } from '../types/domain'
-import { useVirtualList } from '@vueuse/core'
 import tldData from '../data/tlds.json'
 
 // 2. Reactive States and Refs
@@ -16,14 +15,11 @@ const error = ref('')
 const loading = ref(false)
 const isOpen = ref(false)
 const currentLink = ref('')
-const open = ref(false)
-const popover = ref<null | HTMLElement>(null)
+const searchTerm = ref('')
+const selectMenuOpen = ref(false)
 
 // TLD Type filter state
 const tldTypeFilter = ref<'all' | TldType>('all')
-
-// Keyboard navigation state
-const focusedTldIndex = ref(-1)
 
 const formState = reactive({
   search: '',
@@ -31,7 +27,6 @@ const formState = reactive({
 })
 
 const fetchedTLDs = ref([] as string[])
-const search = ref('')
 
 // Get TLD type from static data
 const getTldType = (tldName: string): TldType | null => {
@@ -39,22 +34,23 @@ const getTldType = (tldName: string): TldType | null => {
   return (tld?.type as TldType) ?? null
 }
 
-const filteredTlds = computed(() => {
-  let filtered = fetchedTLDs.value.filter((i) =>
-    i.includes(search.value.toLowerCase())
-  )
-
-  // Apply type filter
-  if (tldTypeFilter.value !== 'all') {
-    filtered = filtered.filter((tld) => getTldType(tld) === tldTypeFilter.value)
-  }
-
-  return filtered
+// Computed: TLDs sorted with selected first, then filtered by type
+const sortedTlds = computed(() => {
+  return [...fetchedTLDs.value].sort((a, b) => {
+    const aSelected = formState.selectedTLDs.includes(a)
+    const bSelected = formState.selectedTLDs.includes(b)
+    if (aSelected && !bSelected) return -1
+    if (!aSelected && bSelected) return 1
+    return a.localeCompare(b)
+  })
 })
 
-const { list, containerProps, wrapperProps } = useVirtualList(filteredTlds, {
-  itemHeight: 40, // Fixed height for each TLD item (padding + content)
-  overscan: 10,
+// Filtered TLDs based on type filter (search is handled by USelectMenu)
+const filteredTlds = computed(() => {
+  if (tldTypeFilter.value === 'all') {
+    return sortedTlds.value
+  }
+  return sortedTlds.value.filter((tld) => getTldType(tld) === tldTypeFilter.value)
 })
 
 // 3. Validation Schema
@@ -80,39 +76,9 @@ onNuxtReady(async () => {
 // 5. Methods
 defineShortcuts({
   ctrl_i: () => {
-    open.value = !open.value
-    toggleTldPicker()
+    selectMenuOpen.value = !selectMenuOpen.value
   },
 })
-
-// Keyboard navigation handler
-function handleTldKeydown(event: KeyboardEvent) {
-  const listLength = filteredTlds.value.length
-
-  switch (event.key) {
-    case 'ArrowDown':
-      event.preventDefault()
-      focusedTldIndex.value = Math.min(
-        focusedTldIndex.value + 1,
-        listLength - 1
-      )
-      break
-    case 'ArrowUp':
-      event.preventDefault()
-      focusedTldIndex.value = Math.max(focusedTldIndex.value - 1, 0)
-      break
-    case 'Enter':
-    case ' ':
-      event.preventDefault()
-      if (focusedTldIndex.value >= 0 && focusedTldIndex.value < listLength) {
-        selectTld(filteredTlds.value[focusedTldIndex.value])
-      }
-      break
-    case 'Escape':
-      open.value = false
-      break
-  }
-}
 
 // Select/Deselect all visible TLDs
 function selectAllTlds() {
@@ -130,24 +96,7 @@ function deselectAllTlds() {
 }
 
 function toggleTldPicker() {
-  fetchedTLDs.value = fetchedTLDs.value.sort((a, b) => {
-    if (formState.selectedTLDs?.includes(a)) {
-      return -1
-    }
-
-    if (formState.selectedTLDs?.includes(b)) {
-      return 1
-    }
-
-    return a > b ? 1 : -1
-  })
-
-  setTimeout(() => {
-    popover.value?.scrollIntoView({ behavior: 'smooth' })
-  }, 200)
-
-  search.value = ''
-  focusedTldIndex.value = -1
+  searchTerm.value = ''
 }
 
 async function fetchTLDs(input: string | null = null): Promise<string[]> {
@@ -160,7 +109,7 @@ async function fetchTLDs(input: string | null = null): Promise<string[]> {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             input: input ?? '',
-            pageSize: 500, // Load all TLDs, virtual list handles rendering
+            pageSize: 550, // Load all TLDs, virtual list handles rendering
           }),
         }),
       {
@@ -170,26 +119,13 @@ async function fetchTLDs(input: string | null = null): Promise<string[]> {
     )
 
     if (fetchError.value || !data.value) {
-      console.error('TLD fetch error:', fetchError.value)
       return defaultTlds
     }
 
     return data.value
   } catch (e) {
-    console.error('TLD fetch failed:', e)
     return defaultTlds
   }
-}
-
-function selectTld(data: string) {
-  const index = formState.selectedTLDs.indexOf(data)
-
-  if (index !== -1) {
-    formState.selectedTLDs.splice(index, 1)
-    return
-  }
-
-  formState.selectedTLDs = [...formState.selectedTLDs, data]
 }
 
 async function checkDomains() {
@@ -206,24 +142,16 @@ async function checkDomains() {
   }
 
   try {
-    const { data, error: fetchError } = await useAsyncData('domains', () =>
-      $fetch('/api/checkDomains', {
-        method: 'post',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody),
-      })
-    )
+    const data = await $fetch('/api/checkDomains', {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestBody),
+    })
 
-    if (fetchError.value) {
-      error.value = t('notifications.generalError')
-      return
-    }
-
-    if (data.value) {
-      domainsResults.value = data.value as DomainsResult
+    if (data) {
+      domainsResults.value = data as DomainsResult
     }
   } catch (e) {
-    console.error('Domain check failed:', e)
     error.value = t('notifications.generalError')
   } finally {
     loading.value = false
@@ -243,7 +171,7 @@ function openLinkModal(domain: string) {
 
 <template>
   <div class="mb-6">
-    <ULandingHero
+    <UPageHero
       :title="$t('header.title')"
       :description="$t('header.subTitle')"
     >
@@ -259,13 +187,13 @@ function openLinkModal(domain: string) {
           to="https://github.com/jpprofessionals/domain-checker"
           target="_blank"
           size="lg"
-          color="gray"
+          color="neutral"
           icon="i-heroicons-cube-transparent"
         >
           {{ $t('header.openSourceRepo') }}
         </UButton>
       </template>
-    </ULandingHero>
+    </UPageHero>
 
     <UContainer id="search">
       <UPageHeader
@@ -283,7 +211,7 @@ function openLinkModal(domain: string) {
         >
           <div class="flex flex-wrap -mx-3">
             <div class="w-full sm:w-3/4 px-3">
-              <UFormGroup
+              <UFormField
                 :label="$t('search.form.inputLabel')"
                 name="search"
                 class="mb-6"
@@ -293,209 +221,128 @@ function openLinkModal(domain: string) {
                   name="search"
                   :loading="loading"
                   :disabled="loading"
-                  color="primary"
                   variant="outline"
                   size="xl"
+                  class="w-full"
                   :placeholder="$t('search.form.inputPlaceholder')"
                   :autofocus="false"
-                  :required="true"
-                  :ui="{ icon: { trailing: { pointer: '' } } }"
                 >
                   <template #trailing>
                     <UButton
-                      :padded="false"
                       variant="link"
                       icon="i-heroicons-magnifying-glass-solid"
                       type="submit"
                     />
                   </template>
                 </UInput>
-              </UFormGroup>
+              </UFormField>
             </div>
             <div class="w-full sm:w-1/4 px-3">
-              <UFormGroup
+              <UFormField
                 :label="$t('search.form.selectMenuLabel')"
                 name="tlds"
                 class="mb-6"
               >
-                <UPopover
-                  v-model:open="open"
-                  overlay
-                  :popper="{ arrow: true }"
+                <USelectMenu
+                  v-model="formState.selectedTLDs"
+                  v-model:open="selectMenuOpen"
+                  v-model:search-term="searchTerm"
+                  multiple
+                  searchable
+                  size="xl"
+                  :color="formState.selectedTLDs.length === 0 ? 'error' : 'primary'"
+                  :highlight="selectMenuOpen || formState.selectedTLDs.length === 0"
+                  :search-input="{ placeholder: $t('search.form.selectMenuPlaceholder') }"
+                  :items="filteredTlds"
+                  :virtualize="{ estimateSize: 36, overscan: 15 }"
+                  :content="{ side: 'bottom', align: 'start', sideOffset: 8 }"
                   :ui="{
-                    container: 'z-50 popover-container group',
-                    popper: {
-                      strategy: 'absolute',
-                    },
+                    content: 'min-w-[320px] max-h-[450px]',
+                    viewport: 'max-h-[300px]',
+                    itemLeadingIcon: 'text-primary',
+                    value: 'truncate',
                   }"
+                  class="w-full transition-all duration-200"
+                  @open="toggleTldPicker"
                 >
-                  <div class="flex flex-auto">
-                    <UButton
-                      size="xl"
-                      color="primary"
-                      class="flex flex-1 rounded-none rounded-s"
-                      variant="outline"
-                      @click="toggleTldPicker()"
-                    >
-                      {{
-                        formState.selectedTLDs.length +
-                        ' ' +
-                        $t('search.form.selectMenuSelectedLabel')
-                      }}
-                    </UButton>
-                    <UButton
-                      size="xl"
-                      color="primary"
-                      class="flex flex-initial justify-center rounded-none rounded-e"
-                      variant="outline"
-                      :icon="
-                        open
-                          ? 'i-heroicons-chevron-up-20-solid'
-                          : 'i-heroicons-chevron-down-20-solid'
-                      "
-                      @click="toggleTldPicker()"
-                    />
-                  </div>
+                  <template #default="{ modelValue }">
+                    <span :class="!modelValue?.length ? 'text-error' : ''">
+                      <template v-if="!modelValue?.length">
+                        {{ $t('search.form.selectMenuSelectedLabelEmpty') }}
+                      </template>
+                      <template v-else-if="modelValue.length <= 4">
+                        {{ modelValue.join(', ') }}
+                      </template>
+                      <template v-else>
+                        {{ modelValue.length }} {{ $t('search.form.selectMenuSelectedLabel') }}
+                      </template>
+                    </span>
+                  </template>
 
-                  <template #panel>
-                    <div
-                      ref="popover"
-                      class="w-full border border-[rgb(var(--color-primary-400))] rounded"
-                      style="background-color: rgb(var(--ui-background))"
-                      @keydown="handleTldKeydown"
-                    >
-                      <!-- Search Input -->
-                      <UInput
-                        v-model="search"
-                        class="p-2"
-                        name="search"
-                        variant="outline"
-                        size="xl"
-                        :placeholder="$t('search.form.selectMenuPlaceholder')"
-                        :autofocus="true"
-                        :autofocus-delay="400"
-                      />
-
-                      <!-- TLD Type Filter Buttons -->
-                      <div class="flex gap-1 px-2 pb-2">
-                        <UButton
-                          size="xs"
-                          :variant="
-                            tldTypeFilter === 'all' ? 'solid' : 'outline'
-                          "
-                          @click="tldTypeFilter = 'all'"
-                        >
-                          {{ $t('tldFilter.all') }}
-                        </UButton>
-                        <UButton
-                          size="xs"
-                          :variant="
-                            tldTypeFilter === 'GENERIC' ? 'solid' : 'outline'
-                          "
-                          @click="tldTypeFilter = 'GENERIC'"
-                        >
-                          {{ $t('tldFilter.generic') }}
-                        </UButton>
-                        <UButton
-                          size="xs"
-                          :variant="
-                            tldTypeFilter === 'COUNTRY_CODE'
-                              ? 'solid'
-                              : 'outline'
-                          "
-                          @click="tldTypeFilter = 'COUNTRY_CODE'"
-                        >
-                          {{ $t('tldFilter.country') }}
-                        </UButton>
-                      </div>
-
-                      <!-- Select All / Deselect All -->
-                      <div
-                        class="flex gap-2 px-2 pb-2 border-b border-gray-200 dark:border-gray-700"
+                  <template #content-top>
+                    <!-- TLD Type Filter Buttons -->
+                    <div class="flex flex-wrap gap-1 p-2">
+                      <UButton
+                        size="xs"
+                        :variant="tldTypeFilter === 'all' ? 'solid' : 'outline'"
+                        @click="tldTypeFilter = 'all'"
                       >
-                        <UButton
-                          size="xs"
-                          variant="ghost"
-                          icon="i-heroicons-check-circle"
-                          @click="selectAllTlds"
-                        >
-                          {{ $t('tldFilter.selectAll') }}
-                        </UButton>
-                        <UButton
-                          size="xs"
-                          variant="ghost"
-                          icon="i-heroicons-x-circle"
-                          @click="deselectAllTlds"
-                        >
-                          {{ $t('tldFilter.deselectAll') }}
-                        </UButton>
-                      </div>
-
-                      <!-- TLD List with Virtual Scrolling -->
-                      <div
-                        v-bind="containerProps"
-                        class="h-64 pt-0 overflow-auto p-2"
-                        role="listbox"
-                        tabindex="0"
+                        {{ $t('tldFilter.all') }}
+                      </UButton>
+                      <UButton
+                        size="xs"
+                        :variant="tldTypeFilter === 'GENERIC' ? 'solid' : 'outline'"
+                        @click="tldTypeFilter = 'GENERIC'"
                       >
-                        <div v-bind="wrapperProps">
-                          <div
-                            v-for="{ index, data } in list"
-                            :key="index"
-                            role="option"
-                            :aria-selected="
-                              formState.selectedTLDs.includes(data)
-                            "
-                            class="p-2 mt-2 flex space-x-2 justify-center items-center cursor-pointer rounded transition-colors"
-                            :class="[
-                              formState.selectedTLDs.includes(data)
-                                ? 'text-[rgb(var(--color-primary-400))] bg-primary-50 dark:bg-primary-900/20'
-                                : 'hover:bg-gray-100 dark:hover:bg-gray-800',
-                              focusedTldIndex === index
-                                ? 'ring-2 ring-primary-400'
-                                : '',
-                            ]"
-                            @click="selectTld(data)"
-                          >
-                            <div class="flex flex-1">
-                              {{ data }}
-                            </div>
-                            <div class="flex">
-                              <Icon
-                                v-if="formState.selectedTLDs.includes(data)"
-                                class="text-[rgb(var(--color-primary-400))]"
-                                name="material-symbols:check"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                        {{ $t('tldFilter.generic') }}
+                      </UButton>
+                      <UButton
+                        size="xs"
+                        :variant="tldTypeFilter === 'COUNTRY_CODE' ? 'solid' : 'outline'"
+                        @click="tldTypeFilter = 'COUNTRY_CODE'"
+                      >
+                        {{ $t('tldFilter.country') }}
+                      </UButton>
+                      <span class="mx-1 border-l border-default"></span>
+                      <UButton
+                        size="xs"
+                        variant="ghost"
+                        icon="i-heroicons-check-circle"
+                        @click="selectAllTlds"
+                      >
+                        {{ $t('tldFilter.selectAll') }}
+                      </UButton>
+                      <UButton
+                        size="xs"
+                        variant="ghost"
+                        icon="i-heroicons-x-circle"
+                        @click="deselectAllTlds"
+                      >
+                        {{ $t('tldFilter.deselectAll') }}
+                      </UButton>
                     </div>
                   </template>
-                </UPopover>
-              </UFormGroup>
+                </USelectMenu>
+              </UFormField>
             </div>
           </div>
         </UForm>
       </UPageHeader>
 
       <div v-if="error.length != 0" class="mt-4">
-        <ULandingCard
-          title="Error"
-          description="Something went wrong, please try again later."
-          color="red"
+        <UPageCard
+          :title="$t('notifications.errorTitle')"
+          :description="error"
           icon="i-heroicons-exclamation-circle"
+          variant="outline"
           :ui="{
-            icon: {
-              wrapper: 'mb-2 flex',
-              base: 'w-10 h-10 flex-shrink-0 text-red-500 dark:text-red-500',
-            },
+            leadingIcon: 'text-red-500 size-8',
           }"
         />
       </div>
 
-      <div id="resultCards" class="grid grid-cols-2 gap-4 mt-8">
-        <ULandingCard
+      <div id="resultCards" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
+        <UPageCard
           v-for="result in domainsResults.domains"
           :key="result.id"
           :title="result.domain"
@@ -504,87 +351,61 @@ function openLinkModal(domain: string) {
               ? 'i-heroicons-lock-open'
               : 'i-heroicons-lock-closed'
           "
-          :ui="
-            result.available
-              ? {
-                  icon: {
-                    wrapper: 'mb-2 flex',
-                    base: 'w-10 h-10 flex-shrink-0 text-green-500 dark:text-green-500',
-                  },
-                }
-              : {
-                  icon: {
-                    wrapper: 'mb-2 flex',
-                    base: 'w-10 h-10 flex-shrink-0 text-red-500 dark:text-red-500',
-                  },
-                }
-          "
+          variant="outline"
+          :class="!result.available ? 'cursor-pointer hover:ring-primary' : ''"
+          :ui="{
+            leadingIcon: result.available ? 'text-green-500 size-8' : 'text-red-500 size-8',
+          }"
           :description="
             result.available
               ? $t('result.domainAvailable')
               : $t('result.domainUsed')
           "
-          @click.prevent.stop="
-            !result.available ? openLinkModal(result.domain) : null
-          "
+          @click="!result.available ? openLinkModal(result.domain) : undefined"
         />
       </div>
     </UContainer>
 
-    <UModal v-model="isOpen">
-      <UCard
-        :ui="{
-          ring: '',
-          divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-        }"
-      >
-        <template #header>
-          <div class="flex items-center justify-between">
-            <h3
-              class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
-            >
-              {{ $t('modal.headline') }}
-            </h3>
-            <UButton
-              color="gray"
-              variant="ghost"
-              icon="i-heroicons-x-mark-20-solid"
-              class="-my-1"
-              @click="isOpen = false"
-            />
-          </div>
-        </template>
-        <UPageCard
-          :title="$t('modal.title')"
-          :description="$t('modal.subTitle')"
-          icon="i-heroicons-exclamation-triangle"
-          class="mb-4"
-          :ui="{
-            icon: {
-              wrapper: 'mb-2 flex',
-              base: 'w-10 h-10 flex-shrink-0 text-orange-500',
-            },
-          }"
-        />
+    <UModal v-model:open="isOpen">
+      <template #content>
+        <UCard>
+          <template #header>
+            <div class="flex items-center justify-between">
+              <h3
+                class="text-base font-semibold leading-6 text-highlighted"
+              >
+                {{ $t('modal.headline') }}
+              </h3>
+              <UButton
+                color="neutral"
+                variant="ghost"
+                icon="i-heroicons-x-mark-20-solid"
+                class="-my-1"
+                @click="isOpen = false"
+              />
+            </div>
+          </template>
+          <UPageCard
+            :title="$t('modal.title')"
+            :description="$t('modal.subTitle')"
+            icon="i-heroicons-exclamation-triangle"
+            variant="ghost"
+            class="mb-4"
+            :ui="{
+              leadingIcon: 'text-orange-500 size-10',
+            }"
+          />
 
-        <UButton
-          block
-          :label="$t('modal.button')"
-          icon="i-heroicons-link"
-          :to="currentLink"
-          target="_blank"
-          color="blue"
-        />
-      </UCard>
+          <UButton
+            block
+            :label="$t('modal.button')"
+            icon="i-heroicons-link"
+            :to="currentLink"
+            target="_blank"
+            color="info"
+          />
+        </UCard>
+      </template>
     </UModal>
   </div>
 </template>
-
-<style scoped>
-:deep(.popover-container) {
-  inset: unset !important;
-  transform: unset !important;
-  width: 100%;
-  margin-top: 8px !important;
-}
-</style>

@@ -53,7 +53,6 @@ export default defineEventHandler(async (event) => {
     const result = await checkDomains(domainsToCheck)
     return result
   } catch (error) {
-    console.error('Error checking domain availability:', error)
     throw createError({ statusMessage: 'Failed to check domain availability', statusCode: 500 })
   }
 })

@@ -16,17 +16,16 @@
     "@iconify-json/circle-flags": "^1.2.10",
     "@iconify-json/heroicons": "^1.2.3",
     "@iconify-json/simple-icons": "^1.2.62",
-    "@nuxt/ui-pro": "^1.8.2",
-    "@nuxtjs/seo": "3.1.0",
-    "@vueuse/core": "^13.1.0",
-    "nuxt": "^3.18.1"
+    "@nuxt/icon": "^2.1.0",
+    "@nuxt/ui": "^4.2.1",
+    "@nuxtjs/seo": "3.2.2",
+    "nuxt": "^4.2.1"
   },
   "devDependencies": {
     "@nuxt/devtools": "^2.7.0",
     "@nuxt/eslint": "^1.11.0",
-    "@nuxtjs/i18n": "^9.5.6",
+    "@nuxtjs/i18n": "^10.2.1",
     "eslint": "^9.39.1",
-    "nuxt-icon": "^0.6.10",
     "nuxt-security": "^2.5.0",
     "vue-tsc": "^2.2.12",
     "zod": "^3.25.76"

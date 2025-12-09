@@ -1,9 +1,11 @@
-<script setup>
+<script setup lang="ts">
+import type { NavigationMenuItem } from '@nuxt/ui'
+
 const { t } = useI18n()
 const { locale, locales } = useI18n()
 const switchLocalePath = useSwitchLocalePath()
 
-const links = computed(() => [
+const links = computed<NavigationMenuItem[]>(() => [
   {
     label: t('global.homepage'),
     to: 'https://jpprofessionals.de/',
@@ -11,12 +13,12 @@ const links = computed(() => [
   },
   {
     label: t('global.imprint'),
-    to: 'https://jpprofessionals.de/impressum',
+    to: 'https://jpprofessionals.de/imprint',
     target: '_blank',
   },
   {
     label: t('global.privacyPolicy'),
-    to: 'https://jpprofessionals.de/privacy-policy',
+    to: 'https://jpprofessionals.de/privacy',
     target: '_blank',
   },
 ])
@@ -25,7 +27,7 @@ const links = computed(() => [
 const structuredData = computed(() => ({
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
-  name: 'JPP\'s Domain Checker',
+  name: "JPP's Domain Checker",
   description: t('global.seoDescription'),
   url: 'https://domain.jpprofessionals.de',
   applicationCategory: 'UtilitiesApplication',
@@ -52,7 +54,7 @@ useHead({
     { name: 'author', content: 'JPProfessionals' },
     { name: 'robots', content: 'index, follow' },
     { property: 'og:type', content: 'website' },
-    { property: 'og:site_name', content: 'JPP\'s Domain Checker' },
+    { property: 'og:site_name', content: "JPP's Domain Checker" },
     { name: 'twitter:card', content: 'summary_large_image' },
   ],
   link: [
@@ -81,49 +83,65 @@ const availableLocales = computed(() => {
 </script>
 
 <template>
-  <UHeader :links="links">
-    <template #logo>
-      <p class="text-sm md:text-base">
-        Domain Checker
-        <UBadge label="Open Source" variant="subtle" class="mb-0.5 block text-center" />
-      </p>
-    </template>
+  <UApp>
+    <UHeader title="Domain Checker">
+      <template #title>
+        <p class="text-sm md:text-base font-bold">
+          Domain Checker
+          <UBadge label="Open Source" variant="subtle" class="mb-0.5 ml-1" />
+        </p>
+      </template>
 
-    <template #right>
-      <UButton
-        v-for="localeLang in availableLocales"
-        :key="localeLang.code"
-        color="gray"
-        variant="ghost"
-        :to="switchLocalePath(localeLang.code)"
-        :label="localeLang.name"
-      >
-        <template #trailing>
-          <UIcon :name="'i-circle-flags-' + localeLang.code" dynamic />
-        </template>
-      </UButton>
-      <UColorModeButton />
+      <UNavigationMenu :items="links" />
 
-      <UButton
-        to="https://github.com/jpprofessionals/domain-checker"
-        target="_blank"
-        icon="i-simple-icons-github"
-        aria-label="GitHub"
-        color="gray"
-        variant="ghost"
-      />
-    </template>
-  </UHeader>
+      <template #right>
+        <UButton
+          v-for="localeLang in availableLocales"
+          :key="localeLang.code"
+          color="neutral"
+          variant="ghost"
+          :to="switchLocalePath(localeLang.code)"
+          :label="localeLang.name"
+        >
+          <template #trailing>
+            <UIcon :name="'i-circle-flags-' + localeLang.code" />
+          </template>
+        </UButton>
+        <UColorModeButton />
 
-  <UMain>
-    <NuxtPage />
-    <UNotifications />
-  </UMain>
+        <UButton
+          to="https://github.com/jpprofessionals/domain-checker"
+          target="_blank"
+          icon="i-simple-icons-github"
+          aria-label="GitHub"
+          color="neutral"
+          variant="ghost"
+        />
+      </template>
 
-  <UFooter>
-    <template #center>
-      <small>Copyright © {{ new Date().getFullYear() }} | Created with
-        <UIcon name="i-heroicons-heart" /> from <a href="https://jpprofessionals.de" target="_blank">JPProfessionals</a></small>
-    </template>
-  </UFooter>
+      <template #body>
+        <UNavigationMenu
+          :items="links"
+          orientation="vertical"
+          class="-mx-2.5"
+        />
+      </template>
+    </UHeader>
+
+    <UMain>
+      <NuxtPage />
+    </UMain>
+
+    <UFooter>
+      <template #center>
+        <small
+          >Copyright © {{ new Date().getFullYear() }} | Created with
+          <UIcon name="i-heroicons-heart" /> from
+          <a href="https://jpprofessionals.de" target="_blank"
+            >JPProfessionals</a
+          ></small
+        >
+      </template>
+    </UFooter>
+  </UApp>
 </template>

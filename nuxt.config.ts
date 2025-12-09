@@ -1,27 +1,30 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  extends: ['@nuxt/ui-pro'],
-
   modules: [
     '@nuxt/ui',
-    'nuxt-icon',
+    '@nuxt/icon',
     'nuxt-security',
     '@nuxtjs/i18n',
     '@nuxtjs/seo',
     '@nuxt/eslint',
   ],
 
+  css: ['~/assets/css/main.css'],
+
   site: {
     url: 'https://domain.jpprofessionals.de',
-    name: 'JPP\'s Domain Checker',
+    name: "JPP's Domain Checker",
     description:
       'This is a streamlined open-source domain checker designed to quickly ascertain whether a domain is available or already in use, all without the annoyance of ads!',
   },
 
   ogImage: { enabled: false },
 
-  ui: {
-    icons: ['heroicons', 'simple-icons', 'circle-flags'],
+  icon: {
+    serverBundle: 'remote',
+    clientBundle: {
+      scan: true,
+    },
   },
 
   devtools: {
@@ -30,6 +33,9 @@ export default defineNuxtConfig({
 
   i18n: {
     vueI18n: './i18n.config.ts',
+    bundle: {
+      optimizeTranslationDirective: false,
+    },
     locales: [
       {
         code: 'en',
@@ -69,7 +75,7 @@ export default defineNuxtConfig({
 
   nitro: {
     prerender: {
-      autoSubfolderIndex: false
+      autoSubfolderIndex: false,
     },
     // Add request limits to prevent memory exhaustion
     experimental: {
