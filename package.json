@@ -19,6 +19,7 @@
     "@nuxt/icon": "^2.1.0",
     "@nuxt/ui": "^4.2.1",
     "@nuxtjs/seo": "3.2.2",
+    "@vercel/analytics": "^1.4.0",
     "nuxt": "^4.2.2"
   },
   "devDependencies": {
