@@ -1,6 +1,4 @@
 #:schema node_modules/wrangler/config-schema.json
 name = "domain-checker"
-compatibility_date = "2024-09-23"
-
-[assets]
-directory = ".output/public"
+pages_build_output_dir = "dist"
+compatibility_date = "2025-03-17"
