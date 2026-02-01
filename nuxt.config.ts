@@ -78,9 +78,28 @@ export default defineNuxtConfig({
     prerender: {
       autoSubfolderIndex: false,
     },
-    // Add request limits to prevent memory exhaustion
+    minify: true,
+    compressPublicAssets: true,
     experimental: {
       wasm: false,
+    },
+  },
+
+  vite: {
+    build: {
+      minify: 'esbuild',
+      cssMinify: 'esbuild',
+      rollupOptions: {
+        output: {
+          manualChunks: (id) => {
+            if (id.includes('node_modules')) {
+              if (id.includes('@nuxt/ui')) return 'ui'
+              if (id.includes('@iconify')) return 'icons'
+              return 'vendor'
+            }
+          },
+        },
+      },
     },
   },
 
