@@ -6,7 +6,8 @@
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
-    "preview": "nuxt preview",
+    "preview": "wrangler pages dev .output/public",
+    "deploy": "wrangler pages deploy .output/public",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -29,6 +30,7 @@
     "eslint": "^9.39.2",
     "nuxt-security": "^2.5.0",
     "vue-tsc": "^2.2.12",
+    "wrangler": "latest",
     "zod": "^3.25.76"
   }
 }

@@ -73,7 +73,8 @@ async function checkDomains(domains: string[]): Promise<DomainsResult> {
     })
   }
 
-  const url = 'https://api.ote-godaddy.com/v1/domains/available?checkType=FAST'
+  // Use production API, not OTE (test) API
+  const url = 'https://api.godaddy.com/v1/domains/available?checkType=FAST'
 
   const response = await $fetch<DomainsResult>(url, {
     headers: {
