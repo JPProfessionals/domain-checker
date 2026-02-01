@@ -17,14 +17,14 @@
     "@iconify-json/heroicons": "^1.2.3",
     "@iconify-json/simple-icons": "^1.2.62",
     "@nuxt/icon": "^2.1.0",
-    "@nuxt/ui": "^4.2.1",
-    "@nuxtjs/seo": "3.2.2",
+    "@nuxt/ui": "^4.4.0",
+    "@nuxtjs/seo": "3.4.0",
     "@vercel/analytics": "^1.4.0",
-    "nuxt": "^4.2.2"
+    "nuxt": "^4.3.0"
   },
   "devDependencies": {
     "@nuxt/devtools": "^2.7.0",
-    "@nuxt/eslint": "^1.11.0",
+    "@nuxt/eslint": "^1.13.0",
     "@nuxtjs/i18n": "^10.2.1",
     "eslint": "^9.39.2",
     "nuxt-security": "^2.5.0",
