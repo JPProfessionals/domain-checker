@@ -1,5 +1,9 @@
 #:schema node_modules/wrangler/config-schema.json
 name = "domain-checker"
-pages_build_output_dir = "dist"
+main = ".output/server/index.mjs"
 compatibility_date = "2025-03-17"
 compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = ".output/public"
+binding = "ASSETS"
