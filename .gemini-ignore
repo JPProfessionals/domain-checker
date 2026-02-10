@@ -1,1 +1,8 @@
-node_modules\n.next\n.nuxt\n.output\ndist\nbuild\n.expo\n.swc
+node_modules
+.next
+.nuxt
+.output
+dist
+build
+.expo
+.swc
