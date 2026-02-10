@@ -123,7 +123,7 @@ async function fetchTLDs(input: string | null = null): Promise<string[]> {
     }
 
     return data.value
-  } catch (e) {
+  } catch {
     return defaultTlds
   }
 }
@@ -151,7 +151,7 @@ async function checkDomains() {
     if (data) {
       domainsResults.value = data as DomainsResult
     }
-  } catch (e) {
+  } catch {
     error.value = t('notifications.generalError')
   } finally {
     loading.value = false
@@ -266,15 +266,15 @@ function openLinkModal(domain: string) {
                   @open="toggleTldPicker"
                 >
                   <template #default="{ modelValue }">
-                    <span :class="!modelValue?.length ? 'text-error' : ''">
-                      <template v-if="!modelValue?.length">
+                    <span :class="!(modelValue as any)?.length ? 'text-error' : ''">
+                      <template v-if="!(modelValue as any)?.length">
                         {{ $t('search.form.selectMenuSelectedLabelEmpty') }}
                       </template>
-                      <template v-else-if="modelValue.length <= 4">
-                        {{ modelValue.join(', ') }}
+                      <template v-else-if="(modelValue as any).length <= 4">
+                        {{ (modelValue as any).join(', ') }}
                       </template>
                       <template v-else>
-                        {{ modelValue.length }} {{ $t('search.form.selectMenuSelectedLabel') }}
+                        {{ (modelValue as any).length }} {{ $t('search.form.selectMenuSelectedLabel') }}
                       </template>
                     </span>
                   </template>
@@ -303,7 +303,7 @@ function openLinkModal(domain: string) {
                       >
                         {{ $t('tldFilter.country') }}
                       </UButton>
-                      <span class="mx-1 border-l border-default"></span>
+                      <span class="mx-1 border-l border-default"/>
                       <UButton
                         size="xs"
                         variant="ghost"

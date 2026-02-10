@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody<CheckDomainsRequestBody>(event)
 
   const baseDomain = body.domain
-  let tlds = body.tlds ? body.tlds : ['.com', '.net', '.org', '.de'] // Default TLDs if none are provided
+  const tlds = body.tlds ? body.tlds : ['.com', '.net', '.org', '.de'] // Default TLDs if none are provided
 
   // Validate base domain
   if (!baseDomain || typeof baseDomain !== 'string') {
@@ -52,7 +52,7 @@ export default defineEventHandler(async (event) => {
     const domainsToCheck = generateDomainList(baseDomain, tlds)
     const result = await checkDomains(domainsToCheck)
     return result
-  } catch (error) {
+  } catch {
     throw createError({ statusMessage: 'Failed to check domain availability', statusCode: 500 })
   }
 })
