@@ -10,6 +10,7 @@ overrides:
   lodash@>=4.0.0 <=4.17.22: '>=4.17.23'
   tar@<7.5.7: '>=7.5.7'
   tar@<=7.5.3: '>=7.5.4'
+  nanotar: 0.3.0
 
 importers:
 
@@ -4669,8 +4670,8 @@ packages:
     engines: {node: ^18 || >=20}
     hasBin: true
 
-  nanotar@0.2.0:
-    resolution: {integrity: sha512-9ca1h0Xjvo9bEkE4UOxgAzLV0jHKe6LMaxo37ND2DAhhAtd0j8pR1Wxz+/goMrZO8AEZTWCmyaOsFI/W5AdpCQ==}
+  nanotar@0.3.0:
+    resolution: {integrity: sha512-Kv2JYYiCzt16Kt5QwAc9BFG89xfPNBx+oQL4GQXD9nLqPkZBiNaqaCWtwnbk/q7UVsTYevvM1b0UF8zmEI4pCg==}
 
   napi-postinstall@0.3.4:
     resolution: {integrity: sha512-PHI5f1O0EP5xJ9gQmFGMS6IZcrVvTjpXjz7Na41gTE7eE2hK11lg04CECCYEEjdc17EV4DO+fkGEtt7TpTaTiQ==}
@@ -11026,7 +11027,7 @@ snapshots:
 
   nanoid@5.1.6: {}
 
-  nanotar@0.2.0: {}
+  nanotar@0.3.0: {}
 
   napi-postinstall@0.3.4: {}
 
@@ -11373,7 +11374,7 @@ snapshots:
       knitwork: 1.3.0
       magic-string: 0.30.21
       mlly: 1.8.0
-      nanotar: 0.2.0
+      nanotar: 0.3.0
       nypm: 0.6.2
       ofetch: 1.5.1
       ohash: 2.0.11
