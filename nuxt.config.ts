@@ -32,7 +32,7 @@ export default defineNuxtConfig({
   },
 
   i18n: {
-    vueI18n: './i18n.config.ts',
+    vueI18n: './i18n/i18n.config.ts',
     bundle: {
     },
     locales: [
@@ -46,6 +46,11 @@ export default defineNuxtConfig({
       },
     ],
     defaultLocale: 'en',
+  },
+
+  runtimeConfig: {
+    godaddyApiKey: process.env.GODADDY_API_KEY,
+    godaddyApiSecret: process.env.GODADDY_API_SECRET,
   },
 
   security: {

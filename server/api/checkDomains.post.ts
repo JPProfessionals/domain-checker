@@ -63,8 +63,9 @@ function generateDomainList(baseDomain: string, tlds: string[]): string[] {
 }
 
 async function checkDomains(domains: string[]): Promise<DomainsResult> {
-  const apiKey = process.env.GODADDY_API_KEY
-  const apiSecret = process.env.GODADDY_API_SECRET
+  const config = useRuntimeConfig()
+  const apiKey = config.godaddyApiKey
+  const apiSecret = config.godaddyApiSecret
 
   if (!apiKey || !apiSecret) {
     throw createError({
