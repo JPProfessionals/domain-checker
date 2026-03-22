@@ -231,7 +231,7 @@ function openLinkModal(domain: string) {
                       color="neutral"
                       variant="link"
                       icon="i-heroicons-x-mark-20-solid"
-                      aria-label="Clear"
+                      :aria-label="$t('search.form.clearButtonAriaLabel')"
                       @click="formState.search = ''"
                     />
                     <UButton

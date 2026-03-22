@@ -26,6 +26,7 @@ export default defineI18nConfig(() => ({
         form: {
           inputLabel: 'Domain Name',
           inputPlaceholder: 'Search Domains...',
+          clearButtonAriaLabel: 'Clear',
           selectMenuLabel: 'TLDs',
           selectMenuPlaceholder: 'Select TLDs',
           selectMenuSearchablePlaceholder: 'Search TLDs...',
@@ -91,6 +92,7 @@ export default defineI18nConfig(() => ({
         form: {
           inputLabel: 'Domainname',
           inputPlaceholder: 'Domains suchen...',
+          clearButtonAriaLabel: 'Löschen',
           selectMenuLabel: 'TLDs',
           selectMenuPlaceholder: 'TLDs auswählen',
           selectMenuSearchablePlaceholder: 'TLDs suchen...',
