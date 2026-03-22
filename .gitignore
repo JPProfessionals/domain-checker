@@ -21,4 +21,8 @@ logs
 # Local env files
 .env
 .env.*
-.env.example
+!.env.example
+
+# Testing
+coverage/
+test_output.txt

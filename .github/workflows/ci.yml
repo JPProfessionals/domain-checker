@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.17.0'
+        
+    - name: Install pnpm
+      uses: pnpm/action-setup@v3
+      with:
+        version: 9
+        
+    - name: Check package.json format
+      run: pnpm install --frozen-lockfile || pnpm install
+      
+    - name: Run Linting
+      run: pnpm run lint
+      
+    - name: Run Typecheck
+      run: pnpm run typecheck
+      
+    - name: Run Tests & Check Coverage
+      run: pnpm run test:coverage
