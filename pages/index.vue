@@ -68,9 +68,7 @@ const schema = z.object({
 // 4. Lifecycle Hooks
 onNuxtReady(async () => {
   const data = await fetchTLDs()
-  fetchedTLDs.value = data.map((tld: string) =>
-    tld.startsWith('.') ? tld : `.${tld}`
-  )
+  fetchedTLDs.value = data
 })
 
 // 5. Methods
@@ -123,7 +121,7 @@ async function fetchTLDs(input: string | null = null): Promise<string[]> {
     }
 
     return data.value
-  } catch (e) {
+  } catch {
     return defaultTlds
   }
 }
@@ -151,7 +149,7 @@ async function checkDomains() {
     if (data) {
       domainsResults.value = data as DomainsResult
     }
-  } catch (e) {
+  } catch {
     error.value = t('notifications.generalError')
   } finally {
     loading.value = false
@@ -164,13 +162,13 @@ async function onSubmit(_event: FormSubmitEvent<z.output<typeof schema>>) {
 }
 
 function openLinkModal(domain: string) {
-  currentLink.value = 'https://' + domain
+  currentLink.value = 'https://who.is/whois/' + domain
   isOpen.value = true
 }
 </script>
 
 <template>
-  <div class="mb-6">
+  <div class="flex flex-col h-full overflow-hidden pb-4">
     <UPageHero
       :title="$t('header.title')"
       :description="$t('header.subTitle')"
@@ -195,7 +193,7 @@ function openLinkModal(domain: string) {
       </template>
     </UPageHero>
 
-    <UContainer id="search">
+    <UContainer id="search" class="flex flex-col flex-1 overflow-hidden min-h-0">
       <UPageHeader
         :headline="$t('search.headline')"
         :title="$t('search.title')"
@@ -228,6 +226,14 @@ function openLinkModal(domain: string) {
                   :autofocus="false"
                 >
                   <template #trailing>
+                    <UButton
+                      v-show="formState.search"
+                      color="neutral"
+                      variant="link"
+                      icon="i-heroicons-x-mark-20-solid"
+                      aria-label="Clear"
+                      @click="formState.search = ''"
+                    />
                     <UButton
                       variant="link"
                       icon="i-heroicons-magnifying-glass-solid"
@@ -265,16 +271,16 @@ function openLinkModal(domain: string) {
                   class="w-full transition-all duration-200"
                   @open="toggleTldPicker"
                 >
-                  <template #default="{ modelValue }">
-                    <span :class="!modelValue?.length ? 'text-error' : ''">
-                      <template v-if="!modelValue?.length">
+                  <template #default>
+                    <span :class="!formState.selectedTLDs?.length ? 'text-error' : ''">
+                      <template v-if="!formState.selectedTLDs?.length">
                         {{ $t('search.form.selectMenuSelectedLabelEmpty') }}
                       </template>
-                      <template v-else-if="modelValue.length <= 4">
-                        {{ modelValue.join(', ') }}
+                      <template v-else-if="formState.selectedTLDs.length <= 4">
+                        {{ formState.selectedTLDs.join(', ') }}
                       </template>
                       <template v-else>
-                        {{ modelValue.length }} {{ $t('search.form.selectMenuSelectedLabel') }}
+                        {{ formState.selectedTLDs.length }} {{ $t('search.form.selectMenuSelectedLabel') }}
                       </template>
                     </span>
                   </template>
@@ -303,7 +309,15 @@ function openLinkModal(domain: string) {
                       >
                         {{ $t('tldFilter.country') }}
                       </UButton>
-                      <span class="mx-1 border-l border-default"></span>
+                      <span class="mx-1 border-l border-default" />
+                      <UButton
+                        size="xs"
+                        variant="ghost"
+                        icon="i-heroicons-arrow-path"
+                        @click="restoreDefaultTlds"
+                      >
+                        {{ $t('tldFilter.default') }}
+                      </UButton>
                       <UButton
                         size="xs"
                         variant="ghost"
@@ -329,7 +343,7 @@ function openLinkModal(domain: string) {
         </UForm>
       </UPageHeader>
 
-      <div v-if="error.length != 0" class="mt-4">
+      <div v-if="error.length != 0" class="mt-4 shrink-0">
         <UPageCard
           :title="$t('notifications.errorTitle')"
           :description="error"
@@ -341,7 +355,12 @@ function openLinkModal(domain: string) {
         />
       </div>
 
-      <div id="resultCards" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
+      <TransitionGroup 
+        name="list" 
+        tag="div" 
+        id="resultCards" 
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6 flex-1 overflow-y-auto p-1 -m-1 pb-16 min-h-0 custom-scrollbar"
+      >
         <UPageCard
           v-for="result in domainsResults.domains"
           :key="result.id"
@@ -363,7 +382,7 @@ function openLinkModal(domain: string) {
           "
           @click="!result.available ? openLinkModal(result.domain) : undefined"
         />
-      </div>
+      </TransitionGroup>
     </UContainer>
 
     <UModal v-model:open="isOpen">
@@ -409,3 +428,35 @@ function openLinkModal(domain: string) {
     </UModal>
   </div>
 </template>
+
+<style scoped>
+/* Transition Group Animations for Domain Cards */
+.list-enter-active,
+.list-leave-active,
+.list-move {
+  transition: all 0.4s cubic-bezier(0.55, 0, 0.1, 1);
+}
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateY(15px);
+}
+.list-leave-active {
+  position: absolute;
+}
+
+/* Custom slick scrollbar for webkit */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: rgba(156, 163, 175, 0.4);
+}
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.8);
+}
+</style>

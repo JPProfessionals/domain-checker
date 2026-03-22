@@ -25,27 +25,27 @@ const links = computed<NavigationMenuItem[]>(() => [
 ])
 
 // Structured Data (JSON-LD) for SEO
-const structuredData = computed(() => ({
-  '@context': 'https://schema.org',
-  '@type': 'WebApplication',
-  name: "JPP's Domain Checker",
-  description: t('global.seoDescription'),
-  url: 'https://domain.jpprofessionals.de',
-  applicationCategory: 'UtilitiesApplication',
-  operatingSystem: 'Any',
-  offers: {
-    '@type': 'Offer',
-    price: '0',
-    priceCurrency: 'EUR',
-  },
-  author: {
-    '@type': 'Organization',
-    name: 'JPProfessionals',
-    url: 'https://jpprofessionals.de',
-  },
-  inLanguage: [locale.value],
-  isAccessibleForFree: true,
-}))
+useSchemaOrg([
+  defineWebSite({
+    name: "JPP's Domain Checker",
+    description: t('global.seoDescription'),
+    url: 'https://domain.jpprofessionals.de',
+    inLanguage: locale.value,
+  }),
+  defineSoftwareApp({
+    name: "JPP's Domain Checker",
+    applicationCategory: 'UtilitiesApplication',
+    operatingSystem: 'Any',
+    offers: {
+      price: '0',
+      priceCurrency: 'EUR',
+    },
+    author: {
+      name: 'JPProfessionals',
+      url: 'https://jpprofessionals.de',
+    },
+  })
+])
 
 useHead({
   title: t('global.seoTitle'),
@@ -61,17 +61,11 @@ useHead({
   link: [
     { rel: 'icon', href: '/favicon.ico' },
     { rel: 'manifest', href: '/site.webmanifest' },
-    { rel: 'preconnect', href: 'https://api.ote-godaddy.com' },
+    { rel: 'preconnect', href: 'https://cloudflare-dns.com' },
   ],
   htmlAttrs: {
     lang: locale.value,
   },
-  script: [
-    {
-      type: 'application/ld+json',
-      innerHTML: JSON.stringify(structuredData.value),
-    },
-  ],
 })
 
 useSeoMeta({
@@ -85,65 +79,67 @@ const availableLocales = computed(() => {
 
 <template>
   <UApp>
-    <UHeader title="Domain Checker">
-      <template #title>
-        <p class="text-sm md:text-base font-bold">
-          Domain Checker
-          <UBadge label="Open Source" variant="subtle" class="mb-0.5 ml-1" />
-        </p>
-      </template>
+    <div class="h-[100dvh] w-full flex flex-col overflow-hidden">
+      <UHeader title="Domain Checker">
+        <template #title>
+          <p class="text-sm md:text-base font-bold">
+            Domain Checker
+            <UBadge label="Open Source" variant="subtle" class="mb-0.5 ml-1" />
+          </p>
+        </template>
 
-      <UNavigationMenu :items="links" />
+        <UNavigationMenu :items="links" />
 
-      <template #right>
-        <UButton
-          v-for="localeLang in availableLocales"
-          :key="localeLang.code"
-          color="neutral"
-          variant="ghost"
-          :to="switchLocalePath(localeLang.code)"
-          :label="localeLang.name"
-        >
-          <template #trailing>
-            <UIcon :name="'i-circle-flags-' + localeLang.code" />
-          </template>
-        </UButton>
-        <UColorModeButton />
+        <template #right>
+          <UButton
+            v-for="localeLang in availableLocales"
+            :key="localeLang.code"
+            color="neutral"
+            variant="ghost"
+            :to="switchLocalePath(localeLang.code)"
+            :label="localeLang.name"
+          >
+            <template #trailing>
+              <UIcon :name="'i-circle-flags-' + localeLang.code" />
+            </template>
+          </UButton>
+          <UColorModeButton />
 
-        <UButton
-          to="https://github.com/jpprofessionals/domain-checker"
-          target="_blank"
-          icon="i-simple-icons-github"
-          aria-label="GitHub"
-          color="neutral"
-          variant="ghost"
-        />
-      </template>
+          <UButton
+            to="https://github.com/jpprofessionals/domain-checker"
+            target="_blank"
+            icon="i-simple-icons-github"
+            aria-label="GitHub"
+            color="neutral"
+            variant="ghost"
+          />
+        </template>
 
-      <template #body>
-        <UNavigationMenu
-          :items="links"
-          orientation="vertical"
-          class="-mx-2.5"
-        />
-      </template>
-    </UHeader>
+        <template #body>
+          <UNavigationMenu
+            :items="links"
+            orientation="vertical"
+            class="-mx-2.5"
+          />
+        </template>
+      </UHeader>
 
-    <UMain>
-      <NuxtPage />
-      <Analytics />
-    </UMain>
+      <UMain class="flex-1 overflow-hidden flex flex-col">
+        <NuxtPage class="flex-1 overflow-hidden flex flex-col" />
+        <Analytics />
+      </UMain>
 
-    <UFooter>
-      <template #center>
-        <small
-          >Copyright © {{ new Date().getFullYear() }} | Created with
-          <UIcon name="i-heroicons-heart" /> from
-          <a href="https://jpprofessionals.de" target="_blank"
-            >JPProfessionals</a
-          ></small
-        >
-      </template>
-    </UFooter>
+      <UFooter class="shrink-0 border-t border-gray-200 dark:border-gray-800">
+        <template #center>
+          <small
+            >Copyright © {{ new Date().getFullYear() }} | Created with
+            <UIcon name="i-heroicons-heart" /> from
+            <a href="https://jpprofessionals.de" target="_blank"
+              >JPProfessionals</a
+            ></small
+          >
+        </template>
+      </UFooter>
+    </div>
   </UApp>
 </template>

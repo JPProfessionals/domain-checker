@@ -1,5 +1,5 @@
-import type { DomainsResult, CheckDomainsRequestBody } from '../../types/domain'
-import { defineEventHandler, readBody } from 'h3'
+import type { DomainsResult, CheckDomainsRequestBody, DomainResult } from '../../types/domain'
+import { defineEventHandler, readBody, createError } from 'h3'
 
 // Performance constants
 const MAX_DOMAIN_LENGTH = 253 // RFC 1035 max domain length
@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody<CheckDomainsRequestBody>(event)
 
   const baseDomain = body.domain
-  let tlds = body.tlds ? body.tlds : ['.com', '.net', '.org', '.de'] // Default TLDs if none are provided
+  const tlds = body.tlds ? body.tlds : ['.com', '.net', '.org', '.de'] // Default TLDs if none are provided
 
   // Validate base domain
   if (!baseDomain || typeof baseDomain !== 'string') {
@@ -52,38 +52,69 @@ export default defineEventHandler(async (event) => {
     const domainsToCheck = generateDomainList(baseDomain, tlds)
     const result = await checkDomains(domainsToCheck)
     return result
-  } catch (error) {
+  } catch {
     throw createError({ statusMessage: 'Failed to check domain availability', statusCode: 500 })
   }
 })
 
 
-function generateDomainList(baseDomain: string, tlds: string[]): string[] {
+export function generateDomainList(baseDomain: string, tlds: string[]): string[] {
   return tlds.map(tld => `${baseDomain}${tld}`)
 }
 
-async function checkDomains(domains: string[]): Promise<DomainsResult> {
-  const apiKey = process.env.GODADDY_API_KEY
-  const apiSecret = process.env.GODADDY_API_SECRET
+export async function checkDomainAvailability(domain: string): Promise<DomainResult> {
+  try {
+    const response = await $fetch<any>(
+      `https://1.1.1.1/dns-query?name=${domain}&type=NS`,
+      {
+        headers: { accept: 'application/dns-json' },
+        responseType: 'json',
+        timeout: 10000,
+      }
+    )
 
-  if (!apiKey || !apiSecret) {
-    throw createError({
-      statusMessage: 'GoDaddy API credentials not configured',
-      statusCode: 500,
-    })
+    // Status 0: NOERROR (domain exists)
+    // Status 3: NXDOMAIN (domain does not exist, or at least has no DNS records)
+    if (response.Status === 3 || (response.Status === 0 && !response.Answer && !response.Authority)) {
+      // It might be NXDOMAIN, but let's double check SOA just in case
+      const soaResponse = await $fetch<any>(
+        `https://1.1.1.1/dns-query?name=${domain}&type=SOA`,
+        {
+          headers: { accept: 'application/dns-json' },
+          responseType: 'json',
+          timeout: 10000,
+        }
+      )
+      
+      const isAvailable = (response.Status === 3 || (response.Status === 0 && !response.Answer && !response.Authority)) &&
+                         (soaResponse.Status === 3 || (soaResponse.Status === 0 && !soaResponse.Answer && !soaResponse.Authority))
+
+      return {
+        id: domain,
+        domain: domain,
+        available: isAvailable
+      }
+    }
+    
+    // If it has NS or SOA records, it's definitely registered
+    return {
+      id: domain,
+      domain: domain,
+      available: false
+    }
+  } catch (error: any) {
+    console.error(`DNS lookup failed for ${domain}:`, error)
+    return {
+      id: domain,
+      domain: domain,
+      available: false // Assume unavailable on error
+    }
   }
+}
 
-  // Use production API, not OTE (test) API
-  const url = 'https://api.godaddy.com/v1/domains/available?checkType=FAST'
-
-  const response = await $fetch<DomainsResult>(url, {
-    headers: {
-      Authorization: `sso-key ${apiKey}:${apiSecret}`,
-      'Content-Type': 'application/json',
-    },
-    body: domains,
-    method: 'POST',
-    timeout: 30000, // 30 second timeout for GoDaddy API
-  })
-  return response
+export async function checkDomains(domains: string[]): Promise<DomainsResult> {
+  const results = await Promise.all(domains.map(checkDomainAvailability))
+  return {
+    domains: results
+  }
 }

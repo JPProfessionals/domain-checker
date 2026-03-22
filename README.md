@@ -2,13 +2,13 @@
 
 # Domain-Checker Tool
 
-This tool allows you to easily check domain name availability directly from your web application, leveraging the GoDaddy API for real-time data. Designed with simplicity and efficiency in mind, it integrates seamlessly into your projects.
+This tool allows you to easily check domain name availability directly from your web application, leveraging native DoH (DNS-over-HTTPS) for real-time data. Designed with simplicity and efficiency in mind, it integrates seamlessly into your projects.
 
 [Live Demo](https://domain.jpprofessionals.de)
 
 ## Features
 
-- ✅ Real-time domain availability checking via GoDaddy API
+- ✅ Real-time domain availability checking via lightning-fast native DoH (DNS-over-HTTPS)
 - ✅ Multi-TLD support with searchable TLD picker
 - ✅ Virtual scrolling for performance-optimized TLD list
 - ✅ Internationalization (i18n) support (English & German)
@@ -21,7 +21,6 @@ This tool allows you to easily check domain name availability directly from your
 
 - Node.js 22.17.0 or higher
 - pnpm 9.x
-- GoDaddy API credentials (for domain checking)
 
 ## Installation
 
@@ -39,9 +38,7 @@ pnpm install
 3. Configure environment variables:
 Create a `.env` file in the root directory:
 ```env
-GODADDY_API_KEY=your_api_key_here
-GODADDY_API_SECRET=your_api_secret_here
-NUXT_PUBLIC_SITE_URL=your_site_url
+NUXT_PUBLIC_SITE_URL=https://your-domain.com
 ```
 
 ## Development
@@ -86,8 +83,8 @@ pnpm run preview
 Build and run with Docker:
 
 ```bash
-docker build --build-arg --build-arg NUXT_PUBLIC_SITE_URL=https://your-domain.com -t domain-checker .
-docker run -p 3000:3000 -e GODADDY_API_KEY=your_key -e GODADDY_API_SECRET=your_secret domain-checker
+docker build --build-arg NUXT_PUBLIC_SITE_URL=https://your-domain.com -t domain-checker .
+docker run -p 3000:3000 domain-checker
 ```
 
 ## Configuration
@@ -101,9 +98,7 @@ The application includes built-in performance optimizations and limits to preven
 - **Domain Name Length**: Maximum 63 characters (RFC 1035 compliant)
 - **Total Domain Length**: Maximum 253 characters
 - **TLD Cache**: 1 hour in-memory cache for TLD list
-- **API Timeouts**: 
-  - TLD API: 10 seconds
-  - GoDaddy API: 30 seconds
+- **API Timeouts**: 10 seconds
 
 ### Rate Limiting
 
@@ -114,8 +109,6 @@ The application includes built-in performance optimizations and limits to preven
 
 | Variable | Description | Required |
 |----------|-------------|----------|
-| `GODADDY_API_KEY` | GoDaddy API key | Yes |
-| `GODADDY_API_SECRET` | GoDaddy API secret | Yes |
 | `NUXT_PUBLIC_SITE_URL` | Public site URL for SEO | Recommended |
 | `NODE_ENV` | Environment mode (development/production) | Auto |
 
