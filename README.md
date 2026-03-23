@@ -102,11 +102,6 @@ The application includes built-in performance optimizations and limits to preven
 - **TLD Cache**: 1 hour in-memory cache for TLD list
 - **API Timeouts**: 10 seconds
 
-### Rate Limiting
-
-- **Development**: 100 requests per 10 seconds
-- **Production**: 5 requests per 10 seconds
-
 ### Environment Variables
 
 | Variable | Description | Required |
@@ -121,11 +116,4 @@ The application includes built-in performance optimizations and limits to preven
 3. **Check Availability**: Click search or press Enter to check domain availability
 4. **View Results**: Results show whether each domain is available or already taken
 
-## Project Structure
-
-# Entwicklungs-Server starten
-npm run dev
-```
-
----
 *Developed by JP Professionals*
