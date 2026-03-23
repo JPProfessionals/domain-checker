@@ -8,7 +8,7 @@ const MAX_DOMAIN_NAME_LENGTH = 63 // Max length per domain label (RFC 1035)
 
 export default defineEventHandler(async (event) => {
   // Reading JSON body from the POST request; default to empty object to guard against null/undefined
-  const body = (await readBody<CheckDomainsRequestBody>(event)) ?? {}
+  const body = ((await readBody(event)) ?? {}) as CheckDomainsRequestBody
 
   const baseDomain = body.domain
   const tlds = body.tlds ? body.tlds : ['.com', '.net', '.org', '.de'] // Default TLDs if none are provided

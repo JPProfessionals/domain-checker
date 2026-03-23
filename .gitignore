@@ -26,3 +26,5 @@ logs
 # Testing
 coverage/
 test_output.txt
+audit_*.txt
+typecheck_output*.txt
