@@ -1,0 +1,21 @@
+# JPP's Domain Checker
+
+> This Domain checker is an open source project where you can check if a domain is already in use or available to buy.
+
+## Features
+- **Fast Lookup**: Uses Cloudflare DNS-over-HTTPS (DoH) for accurate, server-side availability checks.
+- **Multiple TLDs**: Search across multiple Top Level Domains simultaneously (Generic and Country Code).
+- **Privacy First**: No ads, no tracking of the domains you search.
+
+## Technical Details
+- Built with **Nuxt 3** and **Vue 3**.
+- UI components powered by **Nuxt UI** and Tailwind CSS.
+- Deployed on **Cloudflare Pages**.
+- Testing and coverage provided by **Vitest**.
+
+## API Endpoints
+- `POST /api/checkDomains`: Accepts `{ domain: string, tlds: string[] }` and returns `{ domains: [{ id, domain, available }] }`.
+- `POST /api/getTlds`: Accepts `{ input: string, pageSize: number }` and returns array of supported TLDs.
+
+## Source Code
+The repository is open source and can be found at: https://github.com/jpprofessionals/domain-checker

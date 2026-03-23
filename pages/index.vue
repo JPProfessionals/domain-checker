@@ -94,6 +94,10 @@ function deselectAllTlds() {
   )
 }
 
+function restoreDefaultTlds() {
+  formState.selectedTLDs = [...defaultTlds]
+}
+
 function toggleTldPicker() {
   searchTerm.value = ''
 }
