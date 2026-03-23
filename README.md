@@ -1,5 +1,3 @@
-![jpp-domain-checker-screenshot](https://github.com/JPProfessionals/domain-checker/blob/main/.github/domain-tool-mockup.png)
-
 # Domain-Checker Tool
 
 This tool allows you to easily check domain name availability directly from your web application, leveraging native DoH (DNS-over-HTTPS) for real-time data. Designed with simplicity and efficiency in mind, it integrates seamlessly into your projects.
@@ -72,8 +70,12 @@ pnpm run build
 
 ### Preview
 
-Preview the production build locally:
+## 🛠️ Tech Stack
+- **Frontend**: Node.js / TypeScript
+- **API Integration**: GoDaddy Domain API
+- **Styling**: Tailwind CSS
 
+## 🚀 Entwicklung
 ```bash
 pnpm run preview
 ```
@@ -121,56 +123,9 @@ The application includes built-in performance optimizations and limits to preven
 
 ## Project Structure
 
-```
-domain-checker/
-├── server/
-│   └── api/
-│       ├── checkDomains.post.ts    # Domain availability API
-│       └── getTlds.post.ts          # TLD list API with caching
-├── pages/
-│   └── index.vue                   # Main application page
-├── types/
-│   └── domain.ts                   # TypeScript type definitions
-├── i18n/
-│   └── i18n.config.ts              # Internationalization config
-└── nuxt.config.ts                   # Nuxt configuration
+# Entwicklungs-Server starten
+npm run dev
 ```
 
-## Performance Optimizations
-
-- ✅ **In-memory caching** for TLD lists (1 hour TTL)
-- ✅ **Request size limits** to prevent memory exhaustion
-- ✅ **API timeouts** to prevent hanging requests
-- ✅ **Input validation** for domain names and TLD counts
-- ✅ **Virtual scrolling** for large TLD lists
-- ✅ **Rate limiting** to prevent abuse
-- ✅ **Production optimizations** (devtools disabled)
-
-## Security Features
-
-- Request size limits
-- Rate limiting
-- Input validation and sanitization
-- Security headers (CORS, X-Content-Type-Options)
-- Environment variable validation
-
-## Browser Support
-
-Modern browsers that support:
-- ES6+
-- CSS Grid & Flexbox
-- Fetch API
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is open source and available under the [MIT License](LICENSE).
-
-## Credits
-
-Created with ❤️ by [JPProfessionals](https://jpprofessionals.de)
-
-For deployment guidance, refer to the [Nuxt deployment documentation](https://nuxt.com/docs/getting-started/deployment).
+---
+*Developed by JP Professionals*
