@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Analytics } from '@vercel/analytics/nuxt'
 import type { NavigationMenuItem } from '@nuxt/ui'
 
 const { t } = useI18n()

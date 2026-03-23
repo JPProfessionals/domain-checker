@@ -1,5 +1,6 @@
 <script setup lang="ts">
-// 1. Imports - Nuxt auto-imports ref, reactive, computed, etc.
+// 1. Imports
+import { ref, reactive, computed, type Ref } from 'vue'
 import { z } from 'zod'
 import type { FormSubmitEvent } from '#ui/types'
 import type { DomainResult, DomainsResult, TldType } from '../types/domain'
@@ -8,7 +9,7 @@ import tldData from '../data/tlds.json'
 // 2. Reactive States and Refs
 const defaultTlds = ['.com', '.net', '.org', '.de']
 const { t } = useI18n()
-const domainsResults: Ref<DomainsResult> = ref({
+const domainsResults = ref<DomainsResult>({
   domains: [] as DomainResult[],
 })
 const error = ref('')
@@ -45,7 +46,7 @@ const sortedTlds = computed(() => {
   })
 })
 
-// Filtered TLDs based on type filter (search is handled by USelectMenu)
+// Filtered TLDs based on type filter
 const filteredTlds = computed(() => {
   if (tldTypeFilter.value === 'all') {
     return sortedTlds.value
@@ -126,24 +127,19 @@ async function fetchTLDs(input: string | null = null): Promise<string[]> {
   }
 }
 
-async function checkDomains() {
-  // Reset error state before new request
+async function checkDomains(searchDomain: string) {
+  // Reset state
   error.value = ''
   loading.value = true
-
-  // Clear previous results to free memory
   domainsResults.value = { domains: [] }
-
-  const requestBody = {
-    domain: formState.search,
-    tlds: formState.selectedTLDs,
-  }
 
   try {
     const data = await $fetch('/api/checkDomains', {
       method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestBody),
+      body: {
+        domain: searchDomain,
+        tlds: formState.selectedTLDs,
+      },
     })
 
     if (data) {
@@ -156,9 +152,9 @@ async function checkDomains() {
   }
 }
 
- 
-async function onSubmit(_event: FormSubmitEvent<z.output<typeof schema>>) {
-  await checkDomains()
+async function onSubmit(event: FormSubmitEvent<z.output<typeof schema>>) {
+  // ensure the domain is passed from the validated event data
+  await checkDomains(event.data.search)
 }
 
 function openLinkModal(domain: string) {
@@ -175,7 +171,7 @@ function openLinkModal(domain: string) {
     >
       <template #links>
         <UButton
-          to="#check"
+          to="#search"
           size="lg"
           icon="i-heroicons-magnifying-glass-solid"
         >
@@ -205,7 +201,7 @@ function openLinkModal(domain: string) {
           :state="formState"
           :schema="schema"
           class="mt-6"
-          @submit="onSubmit"
+          @submit.prevent="onSubmit"
         >
           <div class="flex flex-wrap -mx-3">
             <div class="w-full sm:w-3/4 px-3">
@@ -238,6 +234,7 @@ function openLinkModal(domain: string) {
                       variant="link"
                       icon="i-heroicons-magnifying-glass-solid"
                       type="submit"
+                      :disabled="loading"
                     />
                   </template>
                 </UInput>
@@ -363,7 +360,7 @@ function openLinkModal(domain: string) {
       >
         <UPageCard
           v-for="result in domainsResults.domains"
-          :key="result.id"
+          :key="result.domain"
           :title="result.domain"
           :icon="
             result.available

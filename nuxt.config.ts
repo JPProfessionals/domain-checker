@@ -47,6 +47,11 @@ export default defineNuxtConfig({
     defaultLocale: 'en',
   },
 
+  runtimeConfig: {
+    godaddyApiKey: process.env.GODADDY_API_KEY,
+    godaddyApiSecret: process.env.GODADDY_API_SECRET,
+  },
+
   security: {
     headers: {
       contentSecurityPolicy: false,
