@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // 1. Imports
-import { ref, reactive, computed, type Ref } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { z } from 'zod'
 import type { FormSubmitEvent } from '#ui/types'
 import type { DomainResult, DomainsResult, TldType } from '../types/domain'
@@ -353,9 +353,9 @@ function openLinkModal(domain: string) {
       </div>
 
       <TransitionGroup 
+        id="resultCards" 
         name="list" 
         tag="div" 
-        id="resultCards" 
         class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6 flex-1 overflow-y-auto p-1 -m-1 pb-16 min-h-0 custom-scrollbar"
       >
         <UPageCard

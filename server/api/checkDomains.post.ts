@@ -62,9 +62,15 @@ export function generateDomainList(baseDomain: string, tlds: string[]): string[]
   return tlds.map(tld => `${baseDomain}${tld}`)
 }
 
+interface DnsResponse {
+  Status: number;
+  Answer?: Array<{ data: string; [key: string]: unknown }>;
+  Authority?: Array<Record<string, unknown>>;
+}
+
 export async function checkDomainAvailability(domain: string): Promise<DomainResult> {
   try {
-    const response = await $fetch<any>(
+    const response = await $fetch<DnsResponse>(
       `https://1.1.1.1/dns-query?name=${encodeURIComponent(domain)}&type=NS`,
       {
         headers: { accept: 'application/dns-json' },
@@ -77,7 +83,7 @@ export async function checkDomainAvailability(domain: string): Promise<DomainRes
     // Status 3: NXDOMAIN (domain does not exist, or at least has no DNS records)
     if (response.Status === 3 || (response.Status === 0 && !response.Answer && !response.Authority)) {
       // It might be NXDOMAIN, but let's double check SOA just in case
-      const soaResponse = await $fetch<any>(
+      const soaResponse = await $fetch<DnsResponse>(
         `https://1.1.1.1/dns-query?name=${encodeURIComponent(domain)}&type=SOA`,
         {
           headers: { accept: 'application/dns-json' },
@@ -102,7 +108,7 @@ export async function checkDomainAvailability(domain: string): Promise<DomainRes
       domain: domain,
       available: false
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`DNS lookup failed for ${domain}:`, error)
     return {
       id: domain,
