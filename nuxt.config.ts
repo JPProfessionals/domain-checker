@@ -32,9 +32,8 @@ export default defineNuxtConfig({
   },
 
   i18n: {
-    vueI18n: './i18n/i18n.config.ts',
-    bundle: {
-    },
+    vueI18n: './i18n.config.ts',
+    bundle: {},
     locales: [
       {
         code: 'en',
@@ -55,9 +54,9 @@ export default defineNuxtConfig({
 
   security: {
     headers: {
+      contentSecurityPolicy: false,
       crossOriginEmbedderPolicy:
         process.env.NODE_ENV === 'development' ? 'unsafe-none' : 'require-corp',
-      contentSecurityPolicy: false,
     },
   },
 

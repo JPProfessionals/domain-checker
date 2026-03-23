@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
   // Apply pagination
   const tldNames = filteredTlds
     .slice(0, pageSize)
-    .map(tld => tld.name)
+    .map(tld => tld.name.startsWith('.') ? tld.name : `.${tld.name}`)
 
   return tldNames
 })

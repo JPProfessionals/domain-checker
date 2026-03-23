@@ -1,5 +1,5 @@
-import type { DomainsResult, CheckDomainsRequestBody } from '../../types/domain'
-import { defineEventHandler, readBody } from 'h3'
+import type { DomainsResult, CheckDomainsRequestBody, DomainResult } from '../../types/domain'
+import { defineEventHandler, readBody, createError } from 'h3'
 
 // Performance constants
 const MAX_DOMAIN_LENGTH = 253 // RFC 1035 max domain length
@@ -7,8 +7,8 @@ const MAX_TLDS_PER_REQUEST = 100 // Limit simultaneous domain checks
 const MAX_DOMAIN_NAME_LENGTH = 63 // Max length per domain label (RFC 1035)
 
 export default defineEventHandler(async (event) => {
-  // Reading JSON body from the POST request
-  const body = await readBody<CheckDomainsRequestBody>(event)
+  // Reading JSON body from the POST request; default to empty object to guard against null/undefined
+  const body = (await readBody<CheckDomainsRequestBody>(event)) ?? {}
 
   const baseDomain = body.domain
   const tlds = body.tlds ? body.tlds : ['.com', '.net', '.org', '.de'] // Default TLDs if none are provided
@@ -58,33 +58,78 @@ export default defineEventHandler(async (event) => {
 })
 
 
-function generateDomainList(baseDomain: string, tlds: string[]): string[] {
+export function generateDomainList(baseDomain: string, tlds: string[]): string[] {
   return tlds.map(tld => `${baseDomain}${tld}`)
 }
 
-async function checkDomains(domains: string[]): Promise<DomainsResult> {
-  const config = useRuntimeConfig()
-  const apiKey = config.godaddyApiKey
-  const apiSecret = config.godaddyApiSecret
+interface DnsResponse {
+  Status: number;
+  Answer?: Array<{ data: string; [key: string]: unknown }>;
+  Authority?: Array<Record<string, unknown>>;
+}
 
-  if (!apiKey || !apiSecret) {
-    throw createError({
-      statusMessage: 'GoDaddy API credentials not configured',
-      statusCode: 500,
-    })
+export async function checkDomainAvailability(domain: string): Promise<DomainResult> {
+  try {
+    const response = await $fetch<DnsResponse>(
+      `https://1.1.1.1/dns-query?name=${encodeURIComponent(domain)}&type=NS`,
+      {
+        headers: { accept: 'application/dns-json' },
+        responseType: 'json',
+        timeout: 10000,
+      }
+    )
+
+    // Status 0: NOERROR (domain exists)
+    // Status 3: NXDOMAIN (domain does not exist, or at least has no DNS records)
+    if (response.Status === 3 || (response.Status === 0 && !response.Answer && !response.Authority)) {
+      // It might be NXDOMAIN, but let's double check SOA just in case
+      const soaResponse = await $fetch<DnsResponse>(
+        `https://1.1.1.1/dns-query?name=${encodeURIComponent(domain)}&type=SOA`,
+        {
+          headers: { accept: 'application/dns-json' },
+          responseType: 'json',
+          timeout: 10000,
+        }
+      )
+      
+      const isAvailable = (response.Status === 3 || (response.Status === 0 && !response.Answer && !response.Authority)) &&
+                         (soaResponse.Status === 3 || (soaResponse.Status === 0 && !soaResponse.Answer && !soaResponse.Authority))
+
+      return {
+        id: domain,
+        domain: domain,
+        available: isAvailable
+      }
+    }
+    
+    // If it has NS or SOA records, it's definitely registered
+    return {
+      id: domain,
+      domain: domain,
+      available: false
+    }
+  } catch (error: unknown) {
+    console.error(`DNS lookup failed for ${domain}:`, error)
+    return {
+      id: domain,
+      domain: domain,
+      available: false // Assume unavailable on error
+    }
   }
+}
 
-  // Use production API, not OTE (test) API
-  const url = 'https://api.godaddy.com/v1/domains/available?checkType=FAST'
+// Maximum number of concurrent DoH lookups; kept small to avoid upstream rate-limiting
+// (each domain triggers up to 2 HTTP requests: NS + SOA)
+const DOH_CONCURRENCY_LIMIT = 5
 
-  const response = await $fetch<DomainsResult>(url, {
-    headers: {
-      Authorization: `sso-key ${apiKey}:${apiSecret}`,
-      'Content-Type': 'application/json',
-    },
-    body: domains,
-    method: 'POST',
-    timeout: 30000, // 30 second timeout for GoDaddy API
-  })
-  return response
+export async function checkDomains(domains: string[]): Promise<DomainsResult> {
+  const results: DomainResult[] = []
+  for (let i = 0; i < domains.length; i += DOH_CONCURRENCY_LIMIT) {
+    const batch = domains.slice(i, i + DOH_CONCURRENCY_LIMIT)
+    const batchResults = await Promise.all(batch.map(checkDomainAvailability))
+    results.push(...batchResults)
+  }
+  return {
+    domains: results
+  }
 }

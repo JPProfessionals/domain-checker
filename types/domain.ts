@@ -3,11 +3,11 @@
 export interface DomainResult {
   id?: string;
   available: boolean;
-  currency: string;
-  definitive: boolean;
   domain: string;
-  period: number;
-  price: number;
+  currency?: string;
+  definitive?: boolean;
+  period?: number;
+  price?: number;
 }
 
 export interface DomainsResult {
@@ -51,9 +51,4 @@ export interface CheckDomainsRequestBody {
   domain: string;
   tlds?: string[];
 }
-
-export interface GoDaddyApiError {
-  response?: {
-    data?: unknown;
-  };
-}
+

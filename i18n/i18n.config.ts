@@ -26,6 +26,7 @@ export default defineI18nConfig(() => ({
         form: {
           inputLabel: 'Domain Name',
           inputPlaceholder: 'Search Domains...',
+          clearButtonAriaLabel: 'Clear',
           selectMenuLabel: 'TLDs',
           selectMenuPlaceholder: 'Select TLDs',
           selectMenuSearchablePlaceholder: 'Search TLDs...',
@@ -40,8 +41,8 @@ export default defineI18nConfig(() => ({
       modal: {
         headline: 'Redirect away?',
         title: 'External URL',
-        subTitle: 'You\'re leaving this site to an unknown external domain!',
-        button: 'I understand, please redirect me...',
+        subTitle: 'You\'re leaving this site to perform a WHOIS lookup on an external domain.',
+        button: 'Continue to WHOIS lookup',
       },
 
       notifications: {
@@ -62,6 +63,7 @@ export default defineI18nConfig(() => ({
         country: 'Country',
         selectAll: 'Select all',
         deselectAll: 'Deselect all',
+        default: 'Default TLDs',
       },
     },
 
@@ -90,6 +92,7 @@ export default defineI18nConfig(() => ({
         form: {
           inputLabel: 'Domainname',
           inputPlaceholder: 'Domains suchen...',
+          clearButtonAriaLabel: 'Löschen',
           selectMenuLabel: 'TLDs',
           selectMenuPlaceholder: 'TLDs auswählen',
           selectMenuSearchablePlaceholder: 'TLDs suchen...',
@@ -104,8 +107,8 @@ export default defineI18nConfig(() => ({
       modal: {
         headline: 'Weiterleitung?',
         title: 'Externe URL',
-        subTitle: 'Du verlässt diese Seite zu einer unbekannten externen Domain!',
-        button: 'Ich verstehe, bitte leite mich weiter...',
+        subTitle: 'Du verlässt diese Seite, um eine WHOIS-Abfrage auf einer externen Domain durchzuführen.',
+        button: 'Weiter zur WHOIS-Abfrage',
       },
       notifications:
         {
@@ -125,6 +128,7 @@ export default defineI18nConfig(() => ({
         country: 'Länder',
         selectAll: 'Alle auswählen',
         deselectAll: 'Alle abwählen',
+        default: 'Standard TLDs',
       },
     },
   },
