@@ -9,12 +9,19 @@ interface DoHAnswer {
   data: string
 }
 
+/** Cloudflare DNS-over-HTTPS JSON response shape (RFC 8484 / Google DNS JSON API) */
 interface DoHResponse {
+  /** DNS response code (0 = NOERROR, 3 = NXDOMAIN) */
   Status: number
+  /** Truncated – response was truncated due to length */
   TC: boolean
+  /** Recursion Desired */
   RD: boolean
+  /** Recursion Available */
   RA: boolean
+  /** Authentic Data – DNSSEC validation succeeded */
   AD: boolean
+  /** Checking Disabled – DNSSEC checking is disabled */
   CD: boolean
   Question: Array<{ name: string; type: number }>
   Answer?: DoHAnswer[]
