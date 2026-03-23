@@ -7,8 +7,8 @@ const MAX_TLDS_PER_REQUEST = 100 // Limit simultaneous domain checks
 const MAX_DOMAIN_NAME_LENGTH = 63 // Max length per domain label (RFC 1035)
 
 export default defineEventHandler(async (event) => {
-  // Reading JSON body from the POST request
-  const body = await readBody<CheckDomainsRequestBody>(event)
+  // Reading JSON body from the POST request; default to empty object to guard against null/undefined
+  const body = (await readBody<CheckDomainsRequestBody>(event)) ?? {}
 
   const baseDomain = body.domain
   const tlds = body.tlds ? body.tlds : ['.com', '.net', '.org', '.de'] // Default TLDs if none are provided
@@ -65,7 +65,7 @@ export function generateDomainList(baseDomain: string, tlds: string[]): string[]
 export async function checkDomainAvailability(domain: string): Promise<DomainResult> {
   try {
     const response = await $fetch<any>(
-      `https://1.1.1.1/dns-query?name=${domain}&type=NS`,
+      `https://1.1.1.1/dns-query?name=${encodeURIComponent(domain)}&type=NS`,
       {
         headers: { accept: 'application/dns-json' },
         responseType: 'json',
@@ -78,7 +78,7 @@ export async function checkDomainAvailability(domain: string): Promise<DomainRes
     if (response.Status === 3 || (response.Status === 0 && !response.Answer && !response.Authority)) {
       // It might be NXDOMAIN, but let's double check SOA just in case
       const soaResponse = await $fetch<any>(
-        `https://1.1.1.1/dns-query?name=${domain}&type=SOA`,
+        `https://1.1.1.1/dns-query?name=${encodeURIComponent(domain)}&type=SOA`,
         {
           headers: { accept: 'application/dns-json' },
           responseType: 'json',
@@ -112,8 +112,17 @@ export async function checkDomainAvailability(domain: string): Promise<DomainRes
   }
 }
 
+// Maximum number of concurrent DoH lookups; kept small to avoid upstream rate-limiting
+// (each domain triggers up to 2 HTTP requests: NS + SOA)
+const DOH_CONCURRENCY_LIMIT = 5
+
 export async function checkDomains(domains: string[]): Promise<DomainsResult> {
-  const results = await Promise.all(domains.map(checkDomainAvailability))
+  const results: DomainResult[] = []
+  for (let i = 0; i < domains.length; i += DOH_CONCURRENCY_LIMIT) {
+    const batch = domains.slice(i, i + DOH_CONCURRENCY_LIMIT)
+    const batchResults = await Promise.all(batch.map(checkDomainAvailability))
+    results.push(...batchResults)
+  }
   return {
     domains: results
   }

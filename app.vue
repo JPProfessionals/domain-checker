@@ -60,7 +60,6 @@ useHead({
   link: [
     { rel: 'icon', href: '/favicon.ico' },
     { rel: 'manifest', href: '/site.webmanifest' },
-    { rel: 'preconnect', href: 'https://cloudflare-dns.com' },
   ],
   htmlAttrs: {
     lang: locale.value,

@@ -26,4 +26,3 @@ logs
 # Testing
 coverage/
 test_output.txt
-.env.example.gemini-ignore
