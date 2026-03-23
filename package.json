@@ -37,11 +37,10 @@
     "vitest": "^4.1.1",
     "vue-tsc": "^3.2.6",
     "wrangler": "latest",
-    "zod": "^4.3.6"
+    "zod": "^3.24.0"
   },
   "pnpm": {
     "overrides": {
-      "@nuxt/test-utils>h3": "2.0.1-rc.18",
       "tar": ">=7.5.11",
       "fast-xml-parser": ">=5.5.7",
       "lodash": ">=4.17.23",

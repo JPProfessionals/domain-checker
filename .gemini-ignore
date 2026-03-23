@@ -1,8 +1,0 @@
-node_modules
-.next
-.nuxt
-.output
-dist
-build
-.expo
-.swc
