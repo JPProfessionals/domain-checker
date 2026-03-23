@@ -1,6 +1,26 @@
 import type { DomainsResult, CheckDomainsRequestBody, DomainResult } from '../../types/domain'
 import { defineEventHandler, readBody, createError } from 'h3'
 
+// Cloudflare DNS-over-HTTPS JSON response shape
+interface DoHAnswer {
+  name: string
+  type: number
+  TTL: number
+  data: string
+}
+
+interface DoHResponse {
+  Status: number
+  TC: boolean
+  RD: boolean
+  RA: boolean
+  AD: boolean
+  CD: boolean
+  Question: Array<{ name: string; type: number }>
+  Answer?: DoHAnswer[]
+  Authority?: DoHAnswer[]
+}
+
 // Performance constants
 const MAX_DOMAIN_LENGTH = 253 // RFC 1035 max domain length
 const MAX_TLDS_PER_REQUEST = 100 // Limit simultaneous domain checks
@@ -64,7 +84,7 @@ export function generateDomainList(baseDomain: string, tlds: string[]): string[]
 
 export async function checkDomainAvailability(domain: string): Promise<DomainResult> {
   try {
-    const response = await $fetch<any>(
+    const response = await $fetch<DoHResponse>(
       `https://1.1.1.1/dns-query?name=${encodeURIComponent(domain)}&type=NS`,
       {
         headers: { accept: 'application/dns-json' },
@@ -77,7 +97,7 @@ export async function checkDomainAvailability(domain: string): Promise<DomainRes
     // Status 3: NXDOMAIN (domain does not exist, or at least has no DNS records)
     if (response.Status === 3 || (response.Status === 0 && !response.Answer && !response.Authority)) {
       // It might be NXDOMAIN, but let's double check SOA just in case
-      const soaResponse = await $fetch<any>(
+      const soaResponse = await $fetch<DoHResponse>(
         `https://1.1.1.1/dns-query?name=${encodeURIComponent(domain)}&type=SOA`,
         {
           headers: { accept: 'application/dns-json' },
@@ -102,7 +122,7 @@ export async function checkDomainAvailability(domain: string): Promise<DomainRes
       domain: domain,
       available: false
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`DNS lookup failed for ${domain}:`, error)
     return {
       id: domain,

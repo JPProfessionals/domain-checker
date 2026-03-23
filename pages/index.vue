@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // 1. Imports
-import { ref, reactive, computed, type Ref } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { z } from 'zod'
 import type { FormSubmitEvent } from '#ui/types'
 import type { DomainResult, DomainsResult, TldType } from '../types/domain'

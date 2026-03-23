@@ -3,14 +3,18 @@ import checkDomainsHandler, { generateDomainList, checkDomainAvailability, check
 import { readBody } from 'h3'
 
 vi.mock('h3', () => ({
-  defineEventHandler: (handler: any) => handler,
+  defineEventHandler: (handler: unknown) => handler,
   readBody: vi.fn(),
-  createError: (err: any) => err
+  createError: (err: unknown) => err
 }))
 
 // Mock $fetch globally for the Node test environment
 const mockFetch = vi.fn()
-globalThis.$fetch = mockFetch as any
+;(globalThis as Record<string, unknown>).$fetch = mockFetch
+
+// The module returns the raw handler due to our defineEventHandler mock
+type TestHandler = (event: Record<string, unknown>) => Promise<unknown>
+const handler = checkDomainsHandler as TestHandler
 
 describe('Domain Checker Business Logic', () => {
 
@@ -63,60 +67,60 @@ describe('Domain Checker Business Logic', () => {
 
   describe('API Route Handler Validations', () => {
     it('throws error if no base domain provided', async () => {
-      // @ts-ignore
+      // @ts-expect-error readBody is mocked
       readBody.mockResolvedValueOnce({ tlds: ['.com'] })
-      await expect((checkDomainsHandler as any)({} as any)).rejects.toHaveProperty('statusCode', 400)
+      await expect(handler({})).rejects.toHaveProperty('statusCode', 400)
     })
 
     it('throws error if domain is too long', async () => {
-      // @ts-ignore
+      // @ts-expect-error readBody is mocked
       readBody.mockResolvedValueOnce({ domain: 'a'.repeat(64), tlds: ['.com'] })
-      await expect((checkDomainsHandler as any)({} as any)).rejects.toHaveProperty('statusCode', 400)
+      await expect(handler({})).rejects.toHaveProperty('statusCode', 400)
     })
 
     it('returns results for valid requests', async () => {
-      // @ts-ignore
+      // @ts-expect-error readBody is mocked
       readBody.mockResolvedValueOnce({ domain: 'test', tlds: ['.com'] })
       mockFetch.mockResolvedValueOnce({ Status: 3 })
       mockFetch.mockResolvedValueOnce({ Status: 3 })
-      const res = await (checkDomainsHandler as any)({} as any)
+      const res = await handler({}) as { domains: unknown[] }
       expect(res.domains.length).toBe(1)
     })
 
     it('throws error for invalid TLD format', async () => {
-      // @ts-ignore
+      // @ts-expect-error readBody is mocked
       readBody.mockResolvedValueOnce({ domain: 'test', tlds: 'not-an-array' })
-      await expect((checkDomainsHandler as any)({} as any)).rejects.toHaveProperty('statusCode', 400)
+      await expect(handler({})).rejects.toHaveProperty('statusCode', 400)
     })
 
     it('throws error for non-string TLDs', async () => {
-      // @ts-ignore
+      // @ts-expect-error readBody is mocked
       readBody.mockResolvedValueOnce({ domain: 'test', tlds: [123] })
-      await expect((checkDomainsHandler as any)({} as any)).rejects.toHaveProperty('statusCode', 400)
+      await expect(handler({})).rejects.toHaveProperty('statusCode', 400)
     })
 
     it('throws error for missing domain', async () => {
-      // @ts-ignore
+      // @ts-expect-error readBody is mocked
       readBody.mockResolvedValueOnce({ tlds: ['.com'] })
-      await expect((checkDomainsHandler as any)({} as any)).rejects.toHaveProperty('statusCode', 400)
+      await expect(handler({})).rejects.toHaveProperty('statusCode', 400)
     })
 
     it('throws error for empty body', async () => {
-      // @ts-ignore
+      // @ts-expect-error readBody is mocked
       readBody.mockResolvedValueOnce({})
-      await expect((checkDomainsHandler as any)({} as any)).rejects.toHaveProperty('statusCode', 400)
+      await expect(handler({})).rejects.toHaveProperty('statusCode', 400)
     })
 
     it('throws error for too many TLDs', async () => {
-      // @ts-ignore
+      // @ts-expect-error readBody is mocked
       readBody.mockResolvedValueOnce({ domain: 'test', tlds: Array(101).fill('.com') })
-      await expect((checkDomainsHandler as any)({} as any)).rejects.toHaveProperty('statusCode', 400)
+      await expect(handler({})).rejects.toHaveProperty('statusCode', 400)
     })
 
     it('throws error if base domain + tld is too long', async () => {
-      // @ts-ignore
+      // @ts-expect-error readBody is mocked
       readBody.mockResolvedValueOnce({ domain: 'a'.repeat(250), tlds: ['.com'] })
-      await expect((checkDomainsHandler as any)({} as any)).rejects.toHaveProperty('statusCode', 400)
+      await expect(handler({})).rejects.toHaveProperty('statusCode', 400)
     })
   })
 })
