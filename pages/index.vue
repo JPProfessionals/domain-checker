@@ -3,17 +3,14 @@
 import { ref, reactive, computed } from 'vue'
 import { z } from 'zod'
 import type { FormSubmitEvent } from '#ui/types'
-import type { DomainResult, DomainsResult, TldType } from '../types/domain'
+import type { TldType } from '../types/domain'
 import tldData from '../data/tlds.json'
 
 // 2. Reactive States and Refs
 const defaultTlds = ['.com', '.net', '.org', '.de']
 const { t } = useI18n()
-const domainsResults = ref<DomainsResult>({
-  domains: [] as DomainResult[],
-})
-const error = ref('')
-const loading = ref(false)
+const { loading, error, domainsResults, checkDomains: searchDomains } = useDomainChecker()
+
 const isOpen = ref(false)
 const currentLink = ref('')
 const searchTerm = ref('')
@@ -27,11 +24,12 @@ const formState = reactive({
   selectedTLDs: defaultTlds,
 })
 
-const fetchedTLDs = ref([] as string[])
+// Directly use static TLD data
+const fetchedTLDs = ref(tldData.tlds.map(tld => tld.name.startsWith('.') ? tld.name : `.${tld.name}`))
 
 // Get TLD type from static data
 const getTldType = (tldName: string): TldType | null => {
-  const tld = tldData.tlds.find((t) => t.name === tldName)
+  const tld = tldData.tlds.find((t) => t.name === tldName || `.${t.name}` === tldName)
   return (tld?.type as TldType) ?? null
 }
 
@@ -66,11 +64,7 @@ const schema = z.object({
     .regex(/^[a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?$/, t('schema.searchRegex')),
 })
 
-// 4. Lifecycle Hooks
-onNuxtReady(async () => {
-  const data = await fetchTLDs()
-  fetchedTLDs.value = data
-})
+// 4. Lifecycle Hooks (Nothing needed here anymore for static TLDs)
 
 // 5. Methods
 defineShortcuts({
@@ -102,63 +96,8 @@ function toggleTldPicker() {
   searchTerm.value = ''
 }
 
-async function fetchTLDs(input: string | null = null): Promise<string[]> {
-  try {
-    const { data, error: fetchError } = await useAsyncData(
-      'tlds',
-      () =>
-        $fetch<string[]>('/api/getTlds', {
-          method: 'post',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            input: input ?? '',
-            pageSize: 550, // Load all TLDs, virtual list handles rendering
-          }),
-        }),
-      {
-        server: false, // Client-side only to reduce SSR memory
-        lazy: true,
-      }
-    )
-
-    if (fetchError.value || !data.value) {
-      return defaultTlds
-    }
-
-    return data.value
-  } catch {
-    return defaultTlds
-  }
-}
-
-async function checkDomains(searchDomain: string) {
-  // Reset state
-  error.value = ''
-  loading.value = true
-  domainsResults.value = { domains: [] }
-
-  try {
-    const data = await $fetch('/api/checkDomains', {
-      method: 'post',
-      body: {
-        domain: searchDomain,
-        tlds: formState.selectedTLDs,
-      },
-    })
-
-    if (data) {
-      domainsResults.value = data as DomainsResult
-    }
-  } catch {
-    error.value = t('notifications.generalError')
-  } finally {
-    loading.value = false
-  }
-}
-
 async function onSubmit(event: FormSubmitEvent<z.output<typeof schema>>) {
-  // ensure the domain is passed from the validated event data
-  await checkDomains(event.data.search)
+  await searchDomains(event.data.search, formState.selectedTLDs)
 }
 
 function openLinkModal(domain: string) {
@@ -202,6 +141,7 @@ function openLinkModal(domain: string) {
       >
         <UForm
           id="check"
+          method="POST"
           :state="formState"
           :schema="schema"
           class="mt-6"
@@ -257,8 +197,8 @@ function openLinkModal(domain: string) {
                   multiple
                   searchable
                   size="xl"
-                  :color="formState.selectedTLDs.length === 0 ? 'error' : 'primary'"
-                  :highlight="selectMenuOpen || formState.selectedTLDs.length === 0"
+                  :color="formState.selectedTLDs.length === 0 || formState.selectedTLDs.length > 50 ? 'error' : 'primary'"
+                  :highlight="selectMenuOpen || formState.selectedTLDs.length === 0 || formState.selectedTLDs.length > 50"
                   :search-input="{ placeholder: $t('search.form.selectMenuPlaceholder') }"
                   :items="filteredTlds"
                   :virtualize="{ estimateSize: 36, overscan: 15 }"
@@ -273,9 +213,12 @@ function openLinkModal(domain: string) {
                   @open="toggleTldPicker"
                 >
                   <template #default>
-                    <span :class="!formState.selectedTLDs?.length ? 'text-error' : ''">
+                    <span :class="!formState.selectedTLDs?.length || formState.selectedTLDs.length > 50 ? 'text-error' : ''">
                       <template v-if="!formState.selectedTLDs?.length">
                         {{ $t('search.form.selectMenuSelectedLabelEmpty') }}
+                      </template>
+                      <template v-else-if="formState.selectedTLDs.length > 50">
+                        {{ formState.selectedTLDs.length }} / 50 TLDs
                       </template>
                       <template v-else-if="formState.selectedTLDs.length <= 4">
                         {{ formState.selectedTLDs.join(', ') }}

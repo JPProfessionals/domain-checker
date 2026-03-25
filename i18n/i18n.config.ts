@@ -49,6 +49,8 @@ export default defineI18nConfig(() => ({
         errorTitle: 'Error',
         generalError:
           'Failed to check domain availability, please try again later.',
+        tooManyTlds: 'Too many TLDs selected (max 50).',
+        noDomainProvided: 'No domain name provided.',
       },
 
       schema: {
@@ -115,6 +117,8 @@ export default defineI18nConfig(() => ({
         errorTitle: 'Fehler',
         generalError:
           'Fehler beim Überprüfen der Domainverfügbarkeit, bitte versuche es später erneut.',
+        tooManyTlds: 'Zu viele TLDs ausgewählt (max. 50).',
+        noDomainProvided: 'Kein Domainname angegeben.',
       },
       schema: {
         searchMin: 'Muss mindestens 3 Zeichen lang sein',
