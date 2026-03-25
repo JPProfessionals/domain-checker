@@ -7,6 +7,7 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
     '@nuxtjs/seo',
     '@nuxt/eslint',
+    '@vercel/analytics',
   ],
 
   css: ['~/assets/css/main.css'],
