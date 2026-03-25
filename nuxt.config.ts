@@ -55,8 +55,7 @@ export default defineNuxtConfig({
   security: {
     headers: {
       contentSecurityPolicy: false,
-      crossOriginEmbedderPolicy:
-        process.env.NODE_ENV === 'development' ? 'unsafe-none' : 'require-corp',
+      crossOriginEmbedderPolicy: false,
     },
   },
 
@@ -92,17 +91,6 @@ export default defineNuxtConfig({
     build: {
       minify: 'esbuild',
       cssMinify: 'esbuild',
-      rollupOptions: {
-        output: {
-          manualChunks: (id) => {
-            if (id.includes('node_modules')) {
-              if (id.includes('@nuxt/ui')) return 'ui'
-              if (id.includes('@iconify')) return 'icons'
-              return 'vendor'
-            }
-          },
-        },
-      },
     },
   },
 
