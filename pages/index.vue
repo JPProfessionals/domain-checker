@@ -141,7 +141,6 @@ function openLinkModal(domain: string) {
       >
         <UForm
           id="check"
-          method="POST"
           :state="formState"
           :schema="schema"
           class="mt-6"

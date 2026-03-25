@@ -16,7 +16,7 @@ describe('useDomainChecker', () => {
     vi.clearAllMocks()
   })
 
-  it('should check domain availability correctly (available)', async () => {
+  it('should check domain availability correctly (available - NXDOMAIN)', async () => {
     mockFetch.mockResolvedValueOnce({ Status: 3 }) // NS lookup: NXDOMAIN
     mockFetch.mockResolvedValueOnce({ Status: 3 }) // SOA lookup: NXDOMAIN
 
@@ -27,8 +27,47 @@ describe('useDomainChecker', () => {
     expect(domainsResults.value.domains[0]!.domain).toBe('example.com')
   })
 
-  it('should check domain availability correctly (unavailable)', async () => {
-    mockFetch.mockResolvedValueOnce({ Status: 0, Answer: [{}] }) // NS lookup: NOERROR
+  it('should check domain availability correctly (available - NOERROR no answer)', async () => {
+    mockFetch.mockResolvedValueOnce({ Status: 0, Answer: undefined, Authority: undefined }) 
+    mockFetch.mockResolvedValueOnce({ Status: 3 }) 
+
+    const { checkDomains, domainsResults } = useDomainChecker()
+    await checkDomains('example', ['.com'])
+
+    expect(domainsResults.value.domains[0]!.available).toBe(true)
+  })
+
+  it('should check domain availability correctly (taken - NS Answer)', async () => {
+    mockFetch.mockResolvedValueOnce({ Status: 0, Answer: [{ name: 'example.com' }] }) 
+
+    const { checkDomains, domainsResults } = useDomainChecker()
+    await checkDomains('example', ['.com'])
+
+    expect(domainsResults.value.domains[0]!.available).toBe(false)
+  })
+
+  it('should check domain availability correctly (taken - NS Authority)', async () => {
+    mockFetch.mockResolvedValueOnce({ Status: 0, Authority: [{ name: 'example.com' }] }) 
+
+    const { checkDomains, domainsResults } = useDomainChecker()
+    await checkDomains('example', ['.com'])
+
+    expect(domainsResults.value.domains[0]!.available).toBe(false)
+  })
+
+  it('should check domain availability correctly (taken - SOA Answer)', async () => {
+    mockFetch.mockResolvedValueOnce({ Status: 3 }) // NS: NXDOMAIN
+    mockFetch.mockResolvedValueOnce({ Status: 0, Answer: [{ type: 6 }] }) // SOA: NOERROR
+
+    const { checkDomains, domainsResults } = useDomainChecker()
+    await checkDomains('example', ['.com'])
+
+    expect(domainsResults.value.domains[0]!.available).toBe(false)
+  })
+
+  it('should check domain availability correctly (taken - Status 0 for both but Answer in one)', async () => {
+    mockFetch.mockResolvedValueOnce({ Status: 0, Answer: undefined, Authority: undefined }) 
+    mockFetch.mockResolvedValueOnce({ Status: 0, Answer: [{ type: 6 }] }) 
 
     const { checkDomains, domainsResults } = useDomainChecker()
     await checkDomains('example', ['.com'])
@@ -58,5 +97,16 @@ describe('useDomainChecker', () => {
     await checkDomains('example', ['.com'])
 
     expect(domainsResults.value.domains[0]!.available).toBe(false)
+  })
+
+  it('should handle multiple TLDs and progressive updates', async () => {
+    mockFetch.mockResolvedValue({ Status: 3 }) // All available
+
+    const { checkDomains, domainsResults } = useDomainChecker()
+    await checkDomains('example', ['.com', '.net'])
+
+    expect(domainsResults.value.domains.length).toBe(2)
+    expect(domainsResults.value.domains[0]!.domain).toBe('example.com')
+    expect(domainsResults.value.domains[1]!.domain).toBe('example.net')
   })
 })
