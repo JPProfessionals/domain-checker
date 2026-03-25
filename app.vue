@@ -124,7 +124,6 @@ const availableLocales = computed(() => {
 
       <UMain class="flex-1 overflow-hidden flex flex-col">
         <NuxtPage class="flex-1 overflow-hidden flex flex-col" />
-        <Analytics />
       </UMain>
 
       <UFooter class="shrink-0 border-t border-gray-200 dark:border-gray-800">

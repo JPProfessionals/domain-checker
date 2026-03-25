@@ -1,7 +1,8 @@
 <script setup lang="ts">
 // 1. Imports
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { z } from 'zod'
+import { useRoute } from 'vue-router'
 import type { FormSubmitEvent } from '#ui/types'
 import type { TldType } from '../types/domain'
 import tldData from '../data/tlds.json'
@@ -64,7 +65,28 @@ const schema = z.object({
     .regex(/^[a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?$/, t('schema.searchRegex')),
 })
 
-// 4. Lifecycle Hooks (Nothing needed here anymore for static TLDs)
+// 4. Lifecycle Hooks
+onMounted(() => {
+  const route = useRoute()
+  
+  if (route.query.search) {
+    formState.search = route.query.search as string
+    
+    // Check if TLDs are provided in query
+    if (route.query.tlds) {
+      const tlds = Array.isArray(route.query.tlds) 
+        ? (route.query.tlds as string[]) 
+        : [route.query.tlds as string]
+      
+      formState.selectedTLDs = tlds
+    }
+
+    // Trigger search if values are restored
+    if (formState.search && formState.selectedTLDs.length > 0) {
+      searchDomains(formState.search, formState.selectedTLDs)
+    }
+  }
+})
 
 // 5. Methods
 defineShortcuts({
