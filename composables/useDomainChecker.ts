@@ -1,10 +1,13 @@
 import type { DomainResult, DomainsResult } from '../types/domain'
+import { isValidDomainLabel, MAX_TLDS_PER_CHECK } from '../utils/domainValidation'
 
 interface DohResponse {
   Status: number
   Answer?: unknown[]
   Authority?: unknown[]
 }
+
+const DOH_ENDPOINT = 'https://1.1.1.1/dns-query'
 
 export const useDomainChecker = () => {
   const { t } = useI18n()
@@ -19,19 +22,20 @@ export const useDomainChecker = () => {
     try {
       // Status 0: NOERROR (domain exists)
       // Status 3: NXDOMAIN (domain does not exist)
+      // Heuristic only — not a registry/RDAP availability guarantee.
       const nsResponse = await $fetch<DohResponse>(
-        `https://1.1.1.1/dns-query?name=${encodeURIComponent(domain)}&type=NS`,
-        { headers: { accept: 'application/dns-json' } }
+        `${DOH_ENDPOINT}?name=${encodeURIComponent(domain)}&type=NS`,
+        { headers: { accept: 'application/dns-json' } },
       )
 
       if (nsResponse.Status === 3 || (nsResponse.Status === 0 && !nsResponse.Answer && !nsResponse.Authority)) {
         const soaResponse = await $fetch<DohResponse>(
-          `https://1.1.1.1/dns-query?name=${encodeURIComponent(domain)}&type=SOA`,
-          { headers: { accept: 'application/dns-json' } }
+          `${DOH_ENDPOINT}?name=${encodeURIComponent(domain)}&type=SOA`,
+          { headers: { accept: 'application/dns-json' } },
         )
 
-        const isAvailable = (nsResponse.Status === 3 || (nsResponse.Status === 0 && !nsResponse.Answer && !nsResponse.Authority)) &&
-          (soaResponse.Status === 3 || (soaResponse.Status === 0 && !soaResponse.Answer && !soaResponse.Authority))
+        const isAvailable = (nsResponse.Status === 3 || (nsResponse.Status === 0 && !nsResponse.Answer && !nsResponse.Authority))
+          && (soaResponse.Status === 3 || (soaResponse.Status === 0 && !soaResponse.Answer && !soaResponse.Authority))
 
         return { id: domain, domain, available: isAvailable }
       }
@@ -39,6 +43,7 @@ export const useDomainChecker = () => {
       return { id: domain, domain, available: false }
     } catch (err) {
       console.error(`DNS lookup failed for ${domain}:`, err)
+      // Fail closed: treat lookup failures as "not available" rather than free to register.
       return { id: domain, domain, available: false }
     }
   }
@@ -48,19 +53,34 @@ export const useDomainChecker = () => {
     error.value = ''
     domainsResults.value = { domains: [] }
 
-    if (tlds.length > 50) {
+    if (tlds.length > MAX_TLDS_PER_CHECK) {
       error.value = t('notifications.tooManyTlds')
       loading.value = false
       return
     }
 
-    if (!baseDomain) {
+    if (!baseDomain || !isValidDomainLabel(baseDomain)) {
       error.value = t('notifications.noDomainProvided')
       loading.value = false
       return
     }
 
-    const domainsToCheck = tlds.map(tld => `${baseDomain}${tld}`)
+    if (tlds.length === 0) {
+      error.value = t('notifications.noTldsSelected')
+      loading.value = false
+      return
+    }
+
+    // Allow single- and multi-label suffixes (e.g. ".com", ".co.uk") after allowlisting at the call site.
+    const tldPattern = /^\.(?:[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)(?:\.(?:[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*))*$/
+    const safeTlds = tlds.filter(tld => tldPattern.test(tld))
+    if (safeTlds.length === 0) {
+      error.value = t('notifications.noTldsSelected')
+      loading.value = false
+      return
+    }
+
+    const domainsToCheck = safeTlds.map(tld => `${baseDomain}${tld}`)
     const results: DomainResult[] = []
 
     try {
@@ -82,6 +102,6 @@ export const useDomainChecker = () => {
     loading: readonly(loading),
     error: readonly(error),
     domainsResults: readonly(domainsResults),
-    checkDomains
+    checkDomains,
   }
 }

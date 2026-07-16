@@ -33,7 +33,7 @@ export default defineNuxtConfig({
   },
 
   i18n: {
-    vueI18n: './i18n.config.ts',
+    vueI18n: './i18n/i18n.config.ts',
     bundle: {},
     locales: [
       {
@@ -48,42 +48,46 @@ export default defineNuxtConfig({
     defaultLocale: 'en',
   },
 
+  // Static client-side app: no private API secrets.
+  // Domain checks run in the browser against Cloudflare DoH (1.1.1.1).
   security: {
+    // No server API routes — rate limiting would be a no-op on static hosting.
+    rateLimiter: false,
     headers: {
+      // COEP breaks some third-party scripts/assets; keep disabled for this static site.
+      crossOriginEmbedderPolicy: false,
       contentSecurityPolicy: {
         'default-src': ["'self'"],
-        'script-src': ["'self'", "'unsafe-inline'", 'https://va.vercel-scripts.com'],
-        'style-src': ["'self'", "'unsafe-inline'"],
-        'img-src': ["'self'", 'data:', 'blob:'],
-        'font-src': ["'self'", 'data:'],
-        // Client-side DoH lookups go directly to Cloudflare
+        'base-uri': ["'self'"],
+        'font-src': ["'self'", 'data:', 'https:'],
+        'form-action': ["'self'"],
+        'frame-ancestors': ["'none'"],
+        'img-src': ["'self'", 'data:', 'https:'],
+        'object-src': ["'none'"],
+        'script-src-attr': ["'none'"],
+        // Nuxt/UI inject inline styles; keep unsafe-inline for styles.
+        'style-src': ["'self'", "'unsafe-inline'", 'https:'],
+        // Nuxt hydration needs inline scripts on static builds.
+        'script-src': ["'self'", "'unsafe-inline'", 'https:'],
         'connect-src': [
           "'self'",
           'https://1.1.1.1',
           'https://cloudflare-dns.com',
-          'https://va.vercel-scripts.com',
           'https://vitals.vercel-insights.com',
+          'https://va.vercel-scripts.com',
+          'https://api.iconify.design',
+          'https://api.simplesvg.com',
+          'https://api.unisvg.com',
         ],
-        'frame-ancestors': ["'none'"],
-        'base-uri': ["'self'"],
-        'form-action': ["'self'"],
+        'upgrade-insecure-requests': true,
       },
-      crossOriginEmbedderPolicy: false,
       xFrameOptions: 'DENY',
-    },
-  },
-
-  routeRules: {
-    '/api/*': {
-      security: {
-        rateLimiter: {
-          tokensPerInterval: process.env.NODE_ENV === 'development' ? 100 : 5,
-          interval: 10000,
-        },
-      },
-      cors: true,
-      headers: {
-        'X-Content-Type-Options': 'nosniff',
+      xContentTypeOptions: 'nosniff',
+      referrerPolicy: 'strict-origin-when-cross-origin',
+      permissionsPolicy: {
+        camera: [],
+        microphone: [],
+        geolocation: [],
       },
     },
   },

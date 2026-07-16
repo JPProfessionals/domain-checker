@@ -6,7 +6,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      include: ['composables/**'],
+      include: ['composables/**', 'utils/**'],
       exclude: ['node_modules/**', '.nuxt/**'],
       thresholds: {
         lines: 80,

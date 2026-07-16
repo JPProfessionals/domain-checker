@@ -1,11 +1,18 @@
 <script setup lang="ts">
 // 1. Imports
 import { ref, reactive, computed, onMounted } from 'vue'
-import { z } from 'zod'
 import { useRoute } from 'vue-router'
 import type { FormSubmitEvent } from '#ui/types'
 import type { TldType } from '../types/domain'
 import tldData from '../data/tlds.json'
+import {
+  buildAllowedTldSet,
+  createDomainSearchSchema,
+  filterAllowedTlds,
+  isSafeDomainName,
+  isValidDomainLabel,
+  MAX_TLDS_PER_CHECK,
+} from '../utils/domainValidation'
 
 // 2. Reactive States and Refs
 const defaultTlds = ['.com', '.net', '.org', '.de']
@@ -22,15 +29,16 @@ const tldTypeFilter = ref<'all' | TldType>('all')
 
 const formState = reactive({
   search: '',
-  selectedTLDs: defaultTlds,
+  selectedTLDs: [...defaultTlds],
 })
 
 // Directly use static TLD data
 const fetchedTLDs = ref(tldData.tlds.map(tld => tld.name.startsWith('.') ? tld.name : `.${tld.name}`))
+const allowedTlds = buildAllowedTldSet(fetchedTLDs.value)
 
 // Get TLD type from static data
 const getTldType = (tldName: string): TldType | null => {
-  const tld = tldData.tlds.find((t) => t.name === tldName || `.${t.name}` === tldName)
+  const tld = tldData.tlds.find(entry => entry.name === tldName || `.${entry.name}` === tldName)
   return (tld?.type as TldType) ?? null
 }
 
@@ -50,41 +58,37 @@ const filteredTlds = computed(() => {
   if (tldTypeFilter.value === 'all') {
     return sortedTlds.value
   }
-  return sortedTlds.value.filter((tld) => getTldType(tld) === tldTypeFilter.value)
+  return sortedTlds.value.filter(tld => getTldType(tld) === tldTypeFilter.value)
 })
 
 // 3. Validation Schema
-const schema = z.object({
-  search: z
-    .string()
-    .min(3, t('schema.searchMin'))
-    .max(
-      63,
-      t('schema.searchMax') || 'Domain name too long (max 63 characters)'
-    )
-    .regex(/^[a-zA-Z0-9]([-a-zA-Z0-9]*[a-zA-Z0-9])?$/, t('schema.searchRegex')),
-})
+const schema = computed(() => createDomainSearchSchema(t))
 
 // 4. Lifecycle Hooks
 onMounted(() => {
   const route = useRoute()
-  
-  if (route.query.search) {
-    formState.search = route.query.search as string
-    
-    // Check if TLDs are provided in query
-    if (route.query.tlds) {
-      const tlds = Array.isArray(route.query.tlds) 
-        ? (route.query.tlds as string[]) 
-        : [route.query.tlds as string]
-      
-      formState.selectedTLDs = tlds
-    }
 
-    // Trigger search if values are restored
-    if (formState.search && formState.selectedTLDs.length > 0) {
-      searchDomains(formState.search, formState.selectedTLDs)
+  if (typeof route.query.search === 'string' && route.query.search) {
+    const candidate = route.query.search
+    if (isValidDomainLabel(candidate)) {
+      formState.search = candidate
     }
+  }
+
+  if (route.query.tlds) {
+    const rawTlds = Array.isArray(route.query.tlds)
+      ? route.query.tlds.filter((value): value is string => typeof value === 'string')
+      : [route.query.tlds as string]
+
+    const sanitized = filterAllowedTlds(rawTlds, allowedTlds)
+    if (sanitized.length > 0) {
+      formState.selectedTLDs = sanitized
+    }
+  }
+
+  // Only auto-search when both search and TLDs are valid after sanitization
+  if (isValidDomainLabel(formState.search) && formState.selectedTLDs.length > 0) {
+    searchDomains(formState.search, formState.selectedTLDs)
   }
 })
 
@@ -95,19 +99,19 @@ defineShortcuts({
   },
 })
 
-// Select/Deselect all visible TLDs
+// Select/Deselect all visible TLDs (hard-capped at MAX_TLDS_PER_CHECK)
 function selectAllTlds() {
-  const tldsToAdd = filteredTlds.value.filter(
-    (tld) => !formState.selectedTLDs.includes(tld)
+  const merged = filterAllowedTlds(
+    [...formState.selectedTLDs, ...filteredTlds.value],
+    allowedTlds,
+    MAX_TLDS_PER_CHECK,
   )
-  formState.selectedTLDs = [...formState.selectedTLDs, ...tldsToAdd]
+  formState.selectedTLDs = merged
 }
 
 function deselectAllTlds() {
   const filteredSet = new Set(filteredTlds.value)
-  formState.selectedTLDs = formState.selectedTLDs.filter(
-    (tld) => !filteredSet.has(tld)
-  )
+  formState.selectedTLDs = formState.selectedTLDs.filter(tld => !filteredSet.has(tld))
 }
 
 function restoreDefaultTlds() {
@@ -118,12 +122,15 @@ function toggleTldPicker() {
   searchTerm.value = ''
 }
 
-async function onSubmit(event: FormSubmitEvent<z.output<typeof schema>>) {
-  await searchDomains(event.data.search, formState.selectedTLDs)
+async function onSubmit(event: FormSubmitEvent<{ search: string }>) {
+  const tlds = filterAllowedTlds(formState.selectedTLDs, allowedTlds)
+  formState.selectedTLDs = tlds
+  await searchDomains(event.data.search, tlds)
 }
 
 function openLinkModal(domain: string) {
-  currentLink.value = 'https://who.is/whois/' + domain
+  if (!isSafeDomainName(domain)) return
+  currentLink.value = `https://who.is/whois/${encodeURIComponent(domain)}`
   isOpen.value = true
 }
 </script>
@@ -218,8 +225,8 @@ function openLinkModal(domain: string) {
                   multiple
                   searchable
                   size="xl"
-                  :color="formState.selectedTLDs.length === 0 || formState.selectedTLDs.length > 50 ? 'error' : 'primary'"
-                  :highlight="selectMenuOpen || formState.selectedTLDs.length === 0 || formState.selectedTLDs.length > 50"
+                  :color="formState.selectedTLDs.length === 0 || formState.selectedTLDs.length > MAX_TLDS_PER_CHECK ? 'error' : 'primary'"
+                  :highlight="selectMenuOpen || formState.selectedTLDs.length === 0 || formState.selectedTLDs.length > MAX_TLDS_PER_CHECK"
                   :search-input="{ placeholder: $t('search.form.selectMenuPlaceholder') }"
                   :items="filteredTlds"
                   :virtualize="{ estimateSize: 36, overscan: 15 }"
@@ -234,12 +241,12 @@ function openLinkModal(domain: string) {
                   @open="toggleTldPicker"
                 >
                   <template #default>
-                    <span :class="!formState.selectedTLDs?.length || formState.selectedTLDs.length > 50 ? 'text-error' : ''">
+                    <span :class="!formState.selectedTLDs?.length || formState.selectedTLDs.length > MAX_TLDS_PER_CHECK ? 'text-error' : ''">
                       <template v-if="!formState.selectedTLDs?.length">
                         {{ $t('search.form.selectMenuSelectedLabelEmpty') }}
                       </template>
-                      <template v-else-if="formState.selectedTLDs.length > 50">
-                        {{ formState.selectedTLDs.length }} / 50 TLDs
+                      <template v-else-if="formState.selectedTLDs.length > MAX_TLDS_PER_CHECK">
+                        {{ formState.selectedTLDs.length }} / {{ MAX_TLDS_PER_CHECK }} TLDs
                       </template>
                       <template v-else-if="formState.selectedTLDs.length <= 4">
                         {{ formState.selectedTLDs.join(', ') }}
@@ -320,10 +327,14 @@ function openLinkModal(domain: string) {
         />
       </div>
 
-      <TransitionGroup 
-        id="resultCards" 
-        name="list" 
-        tag="div" 
+      <p class="mt-2 text-xs text-muted shrink-0">
+        {{ $t('search.dnsDisclaimer') }}
+      </p>
+
+      <TransitionGroup
+        id="resultCards"
+        name="list"
+        tag="div"
         class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6 flex-1 overflow-y-auto p-1 -m-1 pb-16 min-h-0 custom-scrollbar"
       >
         <UPageCard

@@ -36,19 +36,4 @@ export interface TldData {
   totalCount: number;
 }
 
-// API Request/Response types (Legacy - will be removed when Directus is removed)
-export interface TldApiResponse {
-  data: Array<{ name: string }>;
-}
-
-export interface GetTldsRequestBody {
-  input?: string;
-  pageSize?: number;
-  type?: TldType; // Filter by TLD type
-}
-
-export interface CheckDomainsRequestBody {
-  domain: string;
-  tlds?: string[];
-}
 

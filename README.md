@@ -1,119 +1,129 @@
-# Domain-Checker Tool
+# Domain Checker
 
-This tool allows you to easily check domain name availability directly from your web application, leveraging native DoH (DNS-over-HTTPS) for real-time data. Designed with simplicity and efficiency in mind, it integrates seamlessly into your projects.
+Lightning-fast, real-time domain availability checker powered by **DNS-over-HTTPS (DoH)**. Built with Nuxt 4 and Nuxt UI.
 
-[Live Demo](https://domain.jpprofessionals.de)
+[Live Demo](https://domain.jpprofessionals.de) · [GitHub](https://github.com/JPProfessionals/domain-checker)
 
 ## Features
 
-- ✅ Real-time domain availability checking via lightning-fast native DoH (DNS-over-HTTPS)
-- ✅ Multi-TLD support with searchable TLD picker
-- ✅ Virtual scrolling for performance-optimized TLD list
-- ✅ Internationalization (i18n) support (English & German)
-- ✅ Responsive design with dark mode support
-- ✅ Rate limiting and request validation
-- ✅ In-memory caching for improved performance
-- ✅ Docker support for easy deployment
+- Real-time availability checks via Cloudflare DoH (`1.1.1.1`)
+- Multi-TLD picker with search, type filters, and virtual scrolling
+- English & German (i18n)
+- Responsive UI with dark mode (Nuxt UI)
+- Client-side input validation (Zod) and TLD allowlisting
+- Security headers / CSP via `nuxt-security`
+- Static deploy to Cloudflare Pages (primary)
+- Optional Docker image (nginx serving static assets)
+
+## How availability is determined
+
+Checks use a **DNS heuristic** (NS + SOA via DoH), not a registry or RDAP API:
+
+| Signal | Interpretation |
+|--------|----------------|
+| NXDOMAIN / empty NS and SOA | Likely available |
+| NS or SOA present | Likely taken |
+| Lookup error | Treated as not available (fail-closed) |
+
+Registered names without public NS, premium/reserved names, or registry holds can be misclassified. **Always confirm with a registrar before purchasing.**
+
+## Tech stack
+
+- **Nuxt 4** (static / Cloudflare Pages preset)
+- **Nuxt UI** + Tailwind
+- **@nuxtjs/i18n**, **@nuxtjs/seo**, **nuxt-security**
+- **Zod** validation
+- **Vitest** tests
+- **pnpm** package manager
+- **Wrangler** for Pages preview/deploy
 
 ## Prerequisites
 
-- Node.js 22.17.0 or higher
-- pnpm 9.x
+- Node.js **22.17+** (CI uses Node 24)
+- pnpm **9.x**
 
-## Installation
+## Setup
 
-1. Clone the repository:
 ```bash
-git clone https://github.com/jpprofessionals/domain-checker.git
+git clone https://github.com/JPProfessionals/domain-checker.git
 cd domain-checker
-```
-
-2. Install dependencies:
-```bash
 pnpm install
 ```
 
-3. Configure environment variables:
-Create a `.env` file in the root directory:
+Create `.env` (see `.env.example`):
+
 ```env
-NUXT_PUBLIC_SITE_URL=https://your-domain.com
+NUXT_PUBLIC_SITE_URL=https://domain.jpprofessionals.de
 ```
 
-## Development
+## Scripts
 
-### Start Development Server
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Development server |
+| `pnpm build` | Production static build |
+| `pnpm preview` | Preview with Wrangler Pages |
+| `pnpm deploy` | Deploy to Cloudflare Pages project `domain-checker` |
+| `pnpm lint` / `pnpm lint:fix` | ESLint |
+| `pnpm typecheck` | TypeScript |
+| `pnpm test` / `pnpm test:coverage` | Vitest |
 
-Launch the development server at http://localhost:3000:
+## Production deploy (recommended)
+
+Primary target is **Cloudflare Pages** (static output from Nitro preset `cloudflare-pages-static`):
 
 ```bash
-pnpm run dev
+pnpm build
+pnpm deploy
 ```
 
-### Available Scripts
+Or connect the GitHub repo to Cloudflare Pages and set:
 
-- `pnpm run dev` - Start development server
-- `pnpm run build` - Build for production
-- `pnpm run preview` - Preview production build locally
-- `pnpm run lint` - Run ESLint
-- `pnpm run lint:fix` - Fix ESLint errors automatically
-- `pnpm run typecheck` - Run TypeScript type checking
+- Build command: `pnpm install --frozen-lockfile && pnpm build`
+- Output directory: `dist` (Nitro `cloudflare-pages-static` preset)
+- Env: `NUXT_PUBLIC_SITE_URL`
 
-## Production
+## Docker (optional)
 
-### Build
-
-Prepare the application for production:
-
-```bash
-pnpm run build
-```
-
-### Preview
-
-## 🛠️ Tech Stack
-- **Frontend**: Node.js / TypeScript
-- **API Integration**: GoDaddy Domain API
-- **Styling**: Tailwind CSS
-
-## 🚀 Entwicklung
-```bash
-pnpm run preview
-```
-
-### Docker Deployment
-
-Build and run with Docker:
+The image builds the static site and serves it with nginx on port **8080**:
 
 ```bash
 docker build --build-arg NUXT_PUBLIC_SITE_URL=https://your-domain.com -t domain-checker .
-docker run -p 3000:3000 domain-checker
+docker run -p 8080:8080 domain-checker
 ```
 
-## Configuration
+Prefer Cloudflare Pages for production; Docker is for local/offline demos.
 
-### API Limits & Performance
+## Limits & validation
 
-The application includes built-in performance optimizations and limits to prevent memory issues:
+| Rule | Value |
+|------|--------|
+| Domain label length | 3–63 characters |
+| Label charset | Alphanumeric + hyphens (no TLD in the input field) |
+| TLDs per check | Max **50** (allowlisted from `data/tlds.json`) |
+| DoH concurrency | 5 parallel lookups |
+| Deep links | `?search=` and `?tlds=` are validated / allowlisted before auto-search |
 
-- **TLD List**: Maximum 1000 TLDs loaded at once (default: 500)
-- **Domain Checks**: Maximum 100 TLDs per request
-- **Domain Name Length**: Maximum 63 characters (RFC 1035 compliant)
-- **Total Domain Length**: Maximum 253 characters
-- **TLD Cache**: 1 hour in-memory cache for TLD list
-- **API Timeouts**: 10 seconds
-
-### Environment Variables
+## Environment variables
 
 | Variable | Description | Required |
 |----------|-------------|----------|
-| `NUXT_PUBLIC_SITE_URL` | Public site URL for SEO | Recommended |
-| `NODE_ENV` | Environment mode (development/production) | Auto |
+| `NUXT_PUBLIC_SITE_URL` | Canonical public URL (SEO) | Recommended |
+| `NODE_ENV` | `development` / `production` | Auto |
 
-## Using the Domain-Checker Tool
+No third-party registrar API keys are required.
 
-1. **Input Domain Name**: Enter the domain name you wish to check (3-63 characters)
-2. **Select TLDs**: Choose from available TLDs using the searchable picker (max 100 TLDs)
-3. **Check Availability**: Click search or press Enter to check domain availability
-4. **View Results**: Results show whether each domain is available or already taken
+## Security notes
 
-*Developed by JP Professionals*
+- No backend API or private secrets in the static build
+- CSP and related headers configured via `nuxt-security`
+- Query-string TLDs must match the static allowlist
+- WHOIS open-links only accept safe domain hostnames
+
+## CI
+
+GitHub Actions (`CI`) on `main` and pull requests: install (frozen lockfile) → lint → typecheck → test with coverage → build.
+
+---
+
+Developed by [JPProfessionals](https://jpprofessionals.de)

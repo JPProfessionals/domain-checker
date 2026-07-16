@@ -36,6 +36,7 @@ README.md
 *.md
 
 # Docker files (don't copy docker files into themselves)
+# Keep docker/nginx.conf — needed by the multi-stage image.
 dockerfile
 .dockerignore
 
