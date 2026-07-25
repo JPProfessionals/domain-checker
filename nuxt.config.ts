@@ -48,15 +48,28 @@ export default defineNuxtConfig({
     defaultLocale: 'en',
   },
 
-  runtimeConfig: {
-    godaddyApiKey: process.env.GODADDY_API_KEY,
-    godaddyApiSecret: process.env.GODADDY_API_SECRET,
-  },
-
   security: {
     headers: {
-      contentSecurityPolicy: false,
+      contentSecurityPolicy: {
+        'default-src': ["'self'"],
+        'script-src': ["'self'", "'unsafe-inline'", 'https://va.vercel-scripts.com'],
+        'style-src': ["'self'", "'unsafe-inline'"],
+        'img-src': ["'self'", 'data:', 'blob:'],
+        'font-src': ["'self'", 'data:'],
+        // Client-side DoH lookups go directly to Cloudflare
+        'connect-src': [
+          "'self'",
+          'https://1.1.1.1',
+          'https://cloudflare-dns.com',
+          'https://va.vercel-scripts.com',
+          'https://vitals.vercel-insights.com',
+        ],
+        'frame-ancestors': ["'none'"],
+        'base-uri': ["'self'"],
+        'form-action': ["'self'"],
+      },
       crossOriginEmbedderPolicy: false,
+      xFrameOptions: 'DENY',
     },
   },
 
@@ -68,7 +81,6 @@ export default defineNuxtConfig({
           interval: 10000,
         },
       },
-      // Add request size limits to prevent memory issues
       cors: true,
       headers: {
         'X-Content-Type-Options': 'nosniff',
