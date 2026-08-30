@@ -2,4 +2,5 @@
 name = "domain-checker"
 compatibility_date = "2025-03-17"
 compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = ".output/public"
+# Nitro cloudflare-pages-static emits the static site into dist/
+pages_build_output_dir = "dist"

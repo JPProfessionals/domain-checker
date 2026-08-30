@@ -90,6 +90,22 @@ describe('useDomainChecker', () => {
     expect(error.value).toBe('notifications.noDomainProvided')
   })
 
+  it('should reject invalid base domain labels', async () => {
+    const { checkDomains, error } = useDomainChecker()
+    await checkDomains('ex', ['.com'])
+
+    expect(error.value).toBe('notifications.noDomainProvided')
+  })
+
+  it('should reject empty or unsafe TLD lists', async () => {
+    const { checkDomains, error } = useDomainChecker()
+    await checkDomains('example', [])
+    expect(error.value).toBe('notifications.noTldsSelected')
+
+    await checkDomains('example', ['not-a-tld', '../evil'])
+    expect(error.value).toBe('notifications.noTldsSelected')
+  })
+
   it('should handle DNS lookup errors gracefully', async () => {
     mockFetch.mockRejectedValue(new Error('Network error'))
 

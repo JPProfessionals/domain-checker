@@ -23,6 +23,8 @@ export default defineI18nConfig(() => ({
         title: 'Domain Results',
         description:
           'Enter your desired domain, and we will check whether it is available or already taken.',
+        dnsDisclaimer:
+          'Results are a DNS heuristic (NS/SOA via DNS-over-HTTPS), not a registry/RDAP guarantee. Always confirm with your registrar before purchasing.',
         form: {
           inputLabel: 'Domain Name',
           inputPlaceholder: 'Search Domains...',
@@ -51,6 +53,7 @@ export default defineI18nConfig(() => ({
           'Failed to check domain availability, please try again later.',
         tooManyTlds: 'Too many TLDs selected (max 50).',
         noDomainProvided: 'No domain name provided.',
+        noTldsSelected: 'Please select at least one valid TLD.',
       },
 
       schema: {
@@ -91,6 +94,8 @@ export default defineI18nConfig(() => ({
         title: 'Domain Ergebnisse',
         description:
           'Gib deine gewünschte Domain ein und wir überprüfen, ob sie verfügbar ist oder bereits vergeben wurde.',
+        dnsDisclaimer:
+          'Ergebnisse basieren auf einer DNS-Heuristik (NS/SOA via DNS-over-HTTPS), nicht auf einer Registry/RDAP-Garantie. Bitte vor dem Kauf beim Registrar bestätigen.',
         form: {
           inputLabel: 'Domainname',
           inputPlaceholder: 'Domains suchen...',
@@ -112,13 +117,13 @@ export default defineI18nConfig(() => ({
         subTitle: 'Du verlässt diese Seite, um eine WHOIS-Abfrage auf einer externen Domain durchzuführen.',
         button: 'Weiter zur WHOIS-Abfrage',
       },
-      notifications:
-        {
+      notifications: {
         errorTitle: 'Fehler',
         generalError:
           'Fehler beim Überprüfen der Domainverfügbarkeit, bitte versuche es später erneut.',
         tooManyTlds: 'Zu viele TLDs ausgewählt (max. 50).',
         noDomainProvided: 'Kein Domainname angegeben.',
+        noTldsSelected: 'Bitte wähle mindestens eine gültige TLD aus.',
       },
       schema: {
         searchMin: 'Muss mindestens 3 Zeichen lang sein',
