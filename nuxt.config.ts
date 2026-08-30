@@ -1,4 +1,20 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+
+function stripUnheadSsrReplace(plugins: unknown): void {
+  if (!Array.isArray(plugins)) return
+  const list = plugins as { name?: string }[]
+  for (let i = list.length - 1; i >= 0; i--) {
+    const item = list[i] as { name?: string } | unknown[]
+    if (Array.isArray(item)) {
+      stripUnheadSsrReplace(item)
+      continue
+    }
+    if (item && typeof item === 'object' && item.name === 'unhead:ssr-static-replace') {
+      list.splice(i, 1)
+    }
+  }
+}
+
 export default defineNuxtConfig({
   modules: [
     '@nuxt/ui',
@@ -105,8 +121,17 @@ export default defineNuxtConfig({
   },
 
   vite: {
+    plugins: [
+      {
+        name: 'strip-unhead-ssr-static-replace',
+        enforce: 'pre',
+        configResolved(config) {
+          stripUnheadSsrReplace(config.plugins)
+        },
+      },
+    ],
     build: {
-      minify: 'esbuild',
+      minify: false,
       cssMinify: 'esbuild',
       rolldownOptions: {
         output: {
