@@ -46,7 +46,7 @@
   },
   "pnpm": {
     "overrides": {
-      "tar": ">=7.5.20",
+      "tar": ">=7.5.21",
       "fast-xml-parser": ">=5.5.7",
       "lodash": ">=4.17.23",
       "simple-git": ">=3.28.0",
@@ -56,10 +56,12 @@
       "serialize-javascript": ">=6.0.3",
       "undici": ">=7.16.0",
       "svgo": ">=3.4.0",
-      "js-yaml": ">=4.2.0",
-      "shell-quote": ">=1.8.3",
+      "js-yaml": ">=5.2.2",
+      "shell-quote": ">=1.9.0",
       "js-cookie": ">=3.0.5",
-      "@babel/core": ">=7.29.6"
+      "@babel/core": ">=7.29.6",
+      "postcss": ">=8.5.18",
+      "nanoid@^3.0.0": "3.3.18"
     }
   }
 }

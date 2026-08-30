@@ -108,6 +108,22 @@ export default defineNuxtConfig({
     build: {
       minify: 'esbuild',
       cssMinify: 'esbuild',
+      rolldownOptions: {
+        output: {
+          minify: false,
+        },
+      },
+    },
+    esbuild: {
+      drop: [],
+    },
+  },
+
+  hooks: {
+    'vite:extendConfig'(config) {
+      config.build ||= {}
+      config.build.minify = 'esbuild'
+      config.build.cssMinify = 'esbuild'
     },
   },
 
