@@ -119,13 +119,5 @@ export default defineNuxtConfig({
     },
   },
 
-  hooks: {
-    'vite:extendConfig'(config) {
-      config.build ||= {}
-      config.build.minify = 'esbuild'
-      config.build.cssMinify = 'esbuild'
-    },
-  },
-
   compatibilityDate: '2025-03-17',
 })
