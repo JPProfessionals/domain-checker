@@ -112,6 +112,10 @@ export default defineNuxtConfig({
     preset: 'cloudflare-pages-static',
     prerender: {
       autoSubfolderIndex: false,
+      // Non-prerendered locale routes boot as SPA and hit @nuxt/ui 4.9's
+      // Unhead v2-only hookOnce (crash on Nuxt 4.5 / Unhead v3).
+      routes: ['/', '/de'],
+      crawlLinks: true,
     },
     minify: true,
     compressPublicAssets: true,
