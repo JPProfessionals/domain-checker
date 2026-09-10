@@ -90,7 +90,7 @@ export default defineNuxtConfig({
           "'self'",
           'https://1.1.1.1',
           'https://cloudflare-dns.com',
-          'https://vitals.vercel-insights.com',
+          'https://vitals.vercel-analytics.com',
           'https://va.vercel-scripts.com',
           'https://api.iconify.design',
           'https://api.simplesvg.com',
