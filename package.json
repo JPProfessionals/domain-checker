@@ -41,7 +41,7 @@
     "@vue/test-utils": "^2.4.10",
     "eslint": "^10.3.0",
     "happy-dom": "^20.9.0",
-    "vitest": "^4.1.6",
+    "vitest": "^4.1.11",
     "vue-tsc": "^3.2.9",
     "wrangler": "^4.91.0"
   },
