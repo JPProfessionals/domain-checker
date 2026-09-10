@@ -24,6 +24,7 @@ export default defineNuxtConfig({
     '@nuxtjs/seo',
     '@nuxt/eslint',
     '@vercel/analytics',
+    '@vercel/speed-insights',
   ],
 
   css: ['~/assets/css/main.css'],
