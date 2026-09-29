@@ -16,11 +16,6 @@ const links = computed<NavigationMenuItem[]>(() => [
     to: 'https://jpprofessionals.de/imprint',
     target: '_blank',
   },
-  {
-    label: t('global.privacyPolicy'),
-    to: 'https://jpprofessionals.de/privacy',
-    target: '_blank',
-  },
 ])
 
 // Structured Data (JSON-LD) for SEO
@@ -62,7 +57,7 @@ useHead({
     { rel: 'manifest', href: '/site.webmanifest' },
   ],
   htmlAttrs: {
-    lang: locale.value,
+    lang: locale,
   },
 })
 
@@ -95,6 +90,7 @@ const availableLocales = computed(() => {
             color="neutral"
             variant="ghost"
             :to="switchLocalePath(localeLang.code)"
+            :locale="false"
             :label="localeLang.name"
           >
             <template #trailing>
