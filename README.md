@@ -15,6 +15,10 @@ Lightning-fast, real-time domain availability checker powered by **DNS-over-HTTP
 - Static deploy to Cloudflare Pages (primary)
 - Optional Docker image (nginx serving static assets)
 
+## Privacy
+
+See [PRIVACY.md](./PRIVACY.md). Locale is URL-only (`/` = EN, `/de` = DE) — `detectBrowserLanguage` is disabled (no `i18n_redirected` cookie). Theme preference uses `localStorage` (`nuxt-color-mode`). No marketing cookies / Google Analytics. Hosted on Vercel with Vercel Analytics + Speed Insights for usage/performance.
+
 ## How availability is determined
 
 Checks use a **DNS heuristic** (NS + SOA via DoH), not a registry or RDAP API:

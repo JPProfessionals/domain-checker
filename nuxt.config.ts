@@ -63,6 +63,8 @@ export default defineNuxtConfig({
       },
     ],
     defaultLocale: 'en',
+    // URL-only locale (prefix_except_default). No i18n_redirected cookie.
+    detectBrowserLanguage: false,
   },
 
   // Static client-side app: no private API secrets.

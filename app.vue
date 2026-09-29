@@ -7,13 +7,13 @@ const switchLocalePath = useSwitchLocalePath()
 
 const links = computed<NavigationMenuItem[]>(() => [
   {
-    label: t('global.homepage'),
-    to: 'https://jpprofessionals.de/',
+    label: t('global.imprint'),
+    to: 'https://github.com/JPProfessionals/.github/blob/master/IMPRINT.md',
     target: '_blank',
   },
   {
-    label: t('global.imprint'),
-    to: 'https://jpprofessionals.de/imprint',
+    label: t('global.privacyPolicy'),
+    to: 'https://github.com/JPProfessionals/domain-checker/blob/main/PRIVACY.md',
     target: '_blank',
   },
 ])
@@ -121,18 +121,6 @@ const availableLocales = computed(() => {
       <UMain class="flex-1 overflow-hidden flex flex-col">
         <NuxtPage class="flex-1 overflow-hidden flex flex-col" />
       </UMain>
-
-      <UFooter class="shrink-0 border-t border-gray-200 dark:border-gray-800">
-        <template #center>
-          <small
-            >Copyright © {{ new Date().getFullYear() }} | Created with
-            <UIcon name="i-heroicons-heart" /> from
-            <a href="https://jpprofessionals.de" target="_blank"
-              >JPProfessionals</a
-            ></small
-          >
-        </template>
-      </UFooter>
     </div>
   </UApp>
 </template>
