@@ -112,7 +112,10 @@ export default defineNuxtConfig({
   nitro: {
     preset: 'cloudflare-pages-static',
     prerender: {
-      autoSubfolderIndex: false,
+      // Emit de/index.html so Vercel (and CF Pages) serve the prerendered
+      // locale page at /de instead of falling through to SPA 200.html.
+      // autoSubfolderIndex:false wrote de.html, which Vercel did not map to /de.
+      autoSubfolderIndex: true,
       // Non-prerendered locale routes boot as SPA and hit @nuxt/ui 4.9's
       // Unhead v2-only hookOnce (crash on Nuxt 4.5 / Unhead v3).
       routes: ['/', '/de'],

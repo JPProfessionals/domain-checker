@@ -6,7 +6,6 @@ export default defineI18nConfig(() => ({
       global: {
         homepage: 'Homepage',
         imprint: 'Imprint',
-        privacyPolicy: 'Privacy Policy',
         seoTitle: 'Domain Checker',
         seoDescription:
           'This Domain checker is an open source project where you can check if a domain is already in use or available to buy.',
@@ -76,7 +75,6 @@ export default defineI18nConfig(() => ({
       global: {
         homepage: 'Startseite',
         imprint: 'Impressum',
-        privacyPolicy: 'Datenschutzerklärung',
         seoTitle: 'Domain Checker',
         seoDescription:
           'Dieser Domain Checker ist ein Open-Source-Projekt, mit dem du überprüfen kannst, ob eine Domain bereits verwendet wird oder zum Kauf verfügbar ist.',
