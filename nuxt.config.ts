@@ -23,8 +23,6 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
     '@nuxtjs/seo',
     '@nuxt/eslint',
-    '@vercel/analytics',
-    '@vercel/speed-insights',
   ],
 
   css: ['~/assets/css/main.css'],
@@ -63,6 +61,8 @@ export default defineNuxtConfig({
       },
     ],
     defaultLocale: 'en',
+    // URL-only locale (prefix_except_default). No i18n_redirected cookie.
+    detectBrowserLanguage: false,
   },
 
   // Static client-side app: no private API secrets.
@@ -90,8 +90,6 @@ export default defineNuxtConfig({
           "'self'",
           'https://1.1.1.1',
           'https://cloudflare-dns.com',
-          'https://vitals.vercel-analytics.com',
-          'https://va.vercel-scripts.com',
           'https://api.iconify.design',
           'https://api.simplesvg.com',
           'https://api.unisvg.com',
