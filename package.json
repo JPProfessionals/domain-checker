@@ -26,8 +26,6 @@
     "@nuxt/icon": "^2.5.1",
     "@nuxt/ui": "^4.11.1",
     "@nuxtjs/seo": "5.1.3",
-    "@vercel/analytics": "^2.0.1",
-    "@vercel/speed-insights": "^2.0.0",
     "nuxt": "^4.5.2",
     "nuxt-security": "^2.6.0",
     "zod": "^4.6.5"
