@@ -15,6 +15,10 @@ Lightning-fast, real-time domain availability checker powered by **DNS-over-HTTP
 - Static deploy to Cloudflare Pages (primary)
 - Optional Docker image (nginx serving static assets)
 
+## Privacy
+
+No analytics, ads, or tracking pixels. Locale is URL-only (`/` = EN, `/de` = DE) — `detectBrowserLanguage` is disabled so there is no `i18n_redirected` cookie. Theme preference uses `localStorage` (`nuxt-color-mode`) only, not a cookie. Domain checks run in the browser against Cloudflare DoH.
+
 ## How availability is determined
 
 Checks use a **DNS heuristic** (NS + SOA via DoH), not a registry or RDAP API:
