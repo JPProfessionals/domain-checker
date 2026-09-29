@@ -17,7 +17,7 @@ Lightning-fast, real-time domain availability checker powered by **DNS-over-HTTP
 
 ## Privacy
 
-No analytics, ads, or tracking pixels. Locale is URL-only (`/` = EN, `/de` = DE) — `detectBrowserLanguage` is disabled so there is no `i18n_redirected` cookie. Theme preference uses `localStorage` (`nuxt-color-mode`) only, not a cookie. Domain checks run in the browser against Cloudflare DoH.
+See [PRIVACY.md](./PRIVACY.md). Locale is URL-only (`/` = EN, `/de` = DE) — `detectBrowserLanguage` is disabled (no `i18n_redirected` cookie). Theme preference uses `localStorage` (`nuxt-color-mode`). No marketing cookies / Google Analytics. Hosted on Vercel with Vercel Analytics + Speed Insights for usage/performance.
 
 ## How availability is determined
 
