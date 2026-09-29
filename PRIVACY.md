@@ -1,6 +1,6 @@
 # Privacy / Datenschutz
 
-**Controller / Verantwortlicher:** [JPProfessionals](https://jpprofessionals.de) · [Imprint / Impressum](https://jpprofessionals.de/imprint)
+**Controller / Verantwortlicher:** [JPProfessionals](https://jpprofessionals.de) · [Imprint / Impressum](https://github.com/JPProfessionals/.github/blob/master/IMPRINT.md)
 
 This is an open-source domain availability checker. Domain lookups run in your browser against Cloudflare DNS-over-HTTPS (`1.1.1.1` / `cloudflare-dns.com`).
 
@@ -26,7 +26,7 @@ We use **Vercel Web Analytics** and **Vercel Speed Insights** to collect anonymo
 - **Theme:** stored in browser `localStorage` (`nuxt-color-mode`), not a cookie.
 
 ### Contact
-Questions: use the [Imprint](https://jpprofessionals.de/imprint) contact details.
+Questions: use the [Imprint](https://github.com/JPProfessionals/.github/blob/master/IMPRINT.md) contact details.
 
 ---
 
@@ -52,4 +52,4 @@ Wir nutzen **Vercel Web Analytics** und **Vercel Speed Insights** für anonyme N
 - **Theme:** im Browser-`localStorage` (`nuxt-color-mode`), kein Cookie.
 
 ### Kontakt
-Über die Kontaktdaten im [Impressum](https://jpprofessionals.de/imprint).
+Über die Kontaktdaten im [Impressum](https://github.com/JPProfessionals/.github/blob/master/IMPRINT.md).
