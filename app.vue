@@ -8,7 +8,7 @@ const switchLocalePath = useSwitchLocalePath()
 const links = computed<NavigationMenuItem[]>(() => [
   {
     label: t('global.imprint'),
-    to: 'https://jpprofessionals.de/imprint',
+    to: 'https://github.com/JPProfessionals/.github/blob/master/IMPRINT.md',
     target: '_blank',
   },
   {
