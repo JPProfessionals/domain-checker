@@ -63,7 +63,8 @@ export default defineNuxtConfig({
       },
     ],
     defaultLocale: 'en',
-    // URL-only locale (prefix_except_default). No i18n_redirected cookie.
+    // URL-only locale (prefix_except_default). DACH auto-redirect "/" → "/de" lives in
+    // middleware.ts (Vercel edge); manual switch sets the `dc_locale` cookie.
     detectBrowserLanguage: false,
   },
 
