@@ -3,6 +3,8 @@
 export interface DomainResult {
   id?: string;
   available: boolean;
+  /** Lookup failed (network/DoH error) — availability unknown. */
+  error?: boolean;
   domain: string;
   currency?: string;
   definitive?: boolean;
@@ -36,4 +38,4 @@ export interface TldData {
   totalCount: number;
 }
 
-
+

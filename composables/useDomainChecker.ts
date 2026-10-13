@@ -9,6 +9,19 @@ interface DohResponse {
 
 const DOH_ENDPOINT = 'https://1.1.1.1/dns-query'
 
+// Cloudflare answers with `Content-Type: application/dns-json`, which ofetch/$fetch
+// does not recognise as JSON and returns as a string (so `.Status` was undefined and
+// every domain looked "taken"). Parse explicitly and validate the shape.
+async function queryDoh(domain: string, type: 'NS' | 'SOA'): Promise<DohResponse> {
+  const res = await fetch(`${DOH_ENDPOINT}?name=${encodeURIComponent(domain)}&type=${type}`, {
+    headers: { accept: 'application/dns-json' },
+  })
+  if (!res.ok) throw new Error(`DoH ${type} ${res.status}`)
+  const data = JSON.parse(await res.text()) as DohResponse
+  if (typeof data?.Status !== 'number') throw new Error(`DoH ${type}: unexpected response`)
+  return data
+}
+
 export const useDomainChecker = () => {
   const { t } = useI18n()
   const loading = ref(false)
@@ -23,16 +36,10 @@ export const useDomainChecker = () => {
       // Status 0: NOERROR (domain exists)
       // Status 3: NXDOMAIN (domain does not exist)
       // Heuristic only — not a registry/RDAP availability guarantee.
-      const nsResponse = await $fetch<DohResponse>(
-        `${DOH_ENDPOINT}?name=${encodeURIComponent(domain)}&type=NS`,
-        { headers: { accept: 'application/dns-json' } },
-      )
+      const nsResponse = await queryDoh(domain, 'NS')
 
       if (nsResponse.Status === 3 || (nsResponse.Status === 0 && !nsResponse.Answer && !nsResponse.Authority)) {
-        const soaResponse = await $fetch<DohResponse>(
-          `${DOH_ENDPOINT}?name=${encodeURIComponent(domain)}&type=SOA`,
-          { headers: { accept: 'application/dns-json' } },
-        )
+        const soaResponse = await queryDoh(domain, 'SOA')
 
         const isAvailable = (nsResponse.Status === 3 || (nsResponse.Status === 0 && !nsResponse.Answer && !nsResponse.Authority))
           && (soaResponse.Status === 3 || (soaResponse.Status === 0 && !soaResponse.Answer && !soaResponse.Authority))
@@ -43,8 +50,8 @@ export const useDomainChecker = () => {
       return { id: domain, domain, available: false }
     } catch (err) {
       console.error(`DNS lookup failed for ${domain}:`, err)
-      // Fail closed: treat lookup failures as "not available" rather than free to register.
-      return { id: domain, domain, available: false }
+      // Lookup failed: surface as an error instead of claiming "not available".
+      return { id: domain, domain, available: false, error: true }
     }
   }
 

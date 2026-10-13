@@ -37,6 +37,7 @@ export default defineI18nConfig(() => ({
       },
       result: {
         domainAvailable: 'This domain is available.',
+        domainError: 'Check failed — please try again.',
         domainUsed: 'This domain is used and/or not available!',
       },
       modal: {
@@ -107,6 +108,7 @@ export default defineI18nConfig(() => ({
       },
       result: {
         domainAvailable: 'Diese Domain ist verfügbar.',
+        domainError: 'Prüfung fehlgeschlagen – bitte erneut versuchen.',
         domainUsed: 'Diese Domain wird verwendet und/oder ist nicht verfügbar!',
       },
       modal: {
