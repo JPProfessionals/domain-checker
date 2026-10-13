@@ -136,7 +136,7 @@ function openLinkModal(domain: string) {
 </script>
 
 <template>
-  <div class="flex flex-col h-full overflow-hidden pb-4">
+  <div class="flex flex-col lg:h-full lg:overflow-hidden pb-4">
     <UPageHero
       :title="$t('header.title')"
       :description="$t('header.subTitle')"
@@ -161,7 +161,7 @@ function openLinkModal(domain: string) {
       </template>
     </UPageHero>
 
-    <UContainer id="search" class="flex flex-col flex-1 overflow-hidden min-h-0">
+    <UContainer id="search" class="flex flex-col flex-1 lg:overflow-hidden lg:min-h-0">
       <UPageHeader
         :headline="$t('search.headline')"
         :title="$t('search.title')"
@@ -335,7 +335,7 @@ function openLinkModal(domain: string) {
         id="resultCards"
         name="list"
         tag="div"
-        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6 flex-1 overflow-y-auto p-1 -m-1 pb-16 min-h-0 custom-scrollbar"
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6 lg:flex-1 lg:overflow-y-auto p-1 -m-1 pb-16 lg:min-h-0 custom-scrollbar"
       >
         <UPageCard
           v-for="result in domainsResults.domains"

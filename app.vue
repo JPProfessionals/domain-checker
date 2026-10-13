@@ -72,12 +72,12 @@ const availableLocales = computed(() => {
 
 <template>
   <UApp>
-    <div class="h-[100dvh] w-full flex flex-col overflow-hidden">
+    <div class="min-h-[100dvh] lg:h-[100dvh] w-full flex flex-col lg:overflow-hidden">
       <UHeader title="Domain Checker">
         <template #title>
-          <p class="text-sm md:text-base font-bold">
+          <p class="text-sm md:text-base font-bold flex items-center gap-1 whitespace-nowrap">
             Domain Checker
-            <UBadge label="Open Source" variant="subtle" class="mb-0.5 ml-1" />
+            <UBadge label="Open Source" variant="subtle" class="hidden sm:inline-flex mb-0.5 ml-1" />
           </p>
         </template>
 
@@ -91,8 +91,10 @@ const availableLocales = computed(() => {
             variant="ghost"
             :to="switchLocalePath(localeLang.code)"
             :locale="false"
-            :label="localeLang.name"
+            :aria-label="localeLang.name"
+            class="shrink-0"
           >
+            <span class="hidden sm:inline">{{ localeLang.name }}</span>
             <template #trailing>
               <UIcon :name="'i-circle-flags-' + localeLang.code" />
             </template>
@@ -118,8 +120,8 @@ const availableLocales = computed(() => {
         </template>
       </UHeader>
 
-      <UMain class="flex-1 overflow-hidden flex flex-col">
-        <NuxtPage class="flex-1 overflow-hidden flex flex-col" />
+      <UMain class="flex-1 lg:overflow-hidden flex flex-col">
+        <NuxtPage class="flex-1 lg:overflow-hidden flex flex-col" />
       </UMain>
     </div>
   </UApp>
