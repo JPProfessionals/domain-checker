@@ -342,21 +342,27 @@ function openLinkModal(domain: string) {
           :key="result.domain"
           :title="result.domain"
           :icon="
-            result.available
-              ? 'i-heroicons-lock-open'
-              : 'i-heroicons-lock-closed'
+            result.error
+              ? 'i-heroicons-exclamation-triangle'
+              : result.available
+                ? 'i-heroicons-lock-open'
+                : 'i-heroicons-lock-closed'
           "
           variant="outline"
-          :class="!result.available ? 'cursor-pointer hover:ring-primary' : ''"
+          :class="!result.available && !result.error ? 'cursor-pointer hover:ring-primary' : ''"
           :ui="{
-            leadingIcon: result.available ? 'text-green-500 size-8' : 'text-red-500 size-8',
+            leadingIcon: result.error
+              ? 'text-amber-500 size-8'
+              : result.available ? 'text-green-500 size-8' : 'text-red-500 size-8',
           }"
           :description="
-            result.available
-              ? $t('result.domainAvailable')
-              : $t('result.domainUsed')
+            result.error
+              ? $t('result.domainError')
+              : result.available
+                ? $t('result.domainAvailable')
+                : $t('result.domainUsed')
           "
-          @click="!result.available ? openLinkModal(result.domain) : undefined"
+          @click="!result.available && !result.error ? openLinkModal(result.domain) : undefined"
         />
       </TransitionGroup>
     </UContainer>
