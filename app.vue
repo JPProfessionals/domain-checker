@@ -65,6 +65,11 @@ useSeoMeta({
   description: t('global.seoDescription'),
 })
 
+// Remember a manual language choice so the edge middleware never auto-redirects again.
+function rememberLocale(code: string) {
+  document.cookie = `dc_locale=${code}; Path=/; Max-Age=31536000; SameSite=Lax; Secure`
+}
+
 const availableLocales = computed(() => {
   return locales.value.filter((i) => i.code !== locale.value)
 })
@@ -93,6 +98,7 @@ const availableLocales = computed(() => {
             :locale="false"
             :aria-label="localeLang.name"
             class="shrink-0"
+            @click="rememberLocale(localeLang.code)"
           >
             <span class="hidden sm:inline">{{ localeLang.name }}</span>
             <template #trailing>
