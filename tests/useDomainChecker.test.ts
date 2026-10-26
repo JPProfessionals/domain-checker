@@ -8,8 +8,14 @@ vi.stubGlobal('useI18n', () => ({
   t: (key: string) => key
 }))
 
+// The composable calls the global fetch() and parses the DoH body itself
+// (Cloudflare answers with application/dns-json). mockFetch returns the parsed
+// DoH payload; wrap it in a minimal Response-like object.
 const mockFetch = vi.fn()
-vi.stubGlobal('$fetch', mockFetch)
+vi.stubGlobal('fetch', async (...args: unknown[]) => {
+  const payload = await mockFetch(...args)
+  return { ok: true, status: 200, text: async () => JSON.stringify(payload) }
+})
 
 describe('useDomainChecker', () => {
   beforeEach(() => {
