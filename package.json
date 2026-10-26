@@ -30,7 +30,7 @@
     "@vercel/speed-insights": "^2.0.0",
     "nuxt": "^4.5.2",
     "nuxt-security": "^2.6.0",
-    "zod": "^4.6.5"
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "@nuxt/devtools": "4.0.0-alpha.4",
