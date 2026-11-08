@@ -77,7 +77,7 @@ const availableLocales = computed(() => {
 
 <template>
   <UApp>
-    <div class="min-h-[100dvh] lg:h-[100dvh] w-full flex flex-col lg:overflow-hidden">
+    <div class="min-h-[100dvh] w-full flex flex-col">
       <UHeader title="Domain Checker">
         <template #title>
           <p class="text-sm md:text-base font-bold flex items-center gap-1 whitespace-nowrap">
@@ -126,8 +126,8 @@ const availableLocales = computed(() => {
         </template>
       </UHeader>
 
-      <UMain class="flex-1 lg:overflow-hidden flex flex-col">
-        <NuxtPage class="flex-1 lg:overflow-hidden flex flex-col" />
+      <UMain class="flex-1 flex flex-col">
+        <NuxtPage class="flex-1 flex flex-col" />
       </UMain>
     </div>
   </UApp>
