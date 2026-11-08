@@ -131,4 +131,42 @@ describe('useDomainChecker', () => {
     expect(domainsResults.value.domains[0]!.domain).toBe('example.com')
     expect(domainsResults.value.domains[1]!.domain).toBe('example.net')
   })
+
+  it('should ignore results from an older concurrent search (race condition fence)', async () => {
+    let resolveFirstQuery!: (value: unknown) => void
+    const firstPromise = new Promise(resolve => {
+      resolveFirstQuery = resolve
+    })
+
+    // Mock fetch so 'slow.com' hangs until resolveFirstQuery is called
+    mockFetch.mockImplementation(async (url: string) => {
+      if (url.includes('slow')) {
+        await firstPromise
+        return { Status: 3 }
+      }
+      return { Status: 3 }
+    })
+
+    const { checkDomains, domainsResults, loading } = useDomainChecker()
+
+    // 1. Start slow check
+    const run1 = checkDomains('slow', ['.com', '.net'])
+    expect(loading.value).toBe(true)
+
+    // 2. Quickly start second check for 'fast'
+    const run2 = checkDomains('fast', ['.org'])
+
+    // Wait for run2 to finish
+    await run2
+    expect(domainsResults.value.domains.map(d => d.domain)).toEqual(['fast.org'])
+    expect(loading.value).toBe(false)
+
+    // 3. Late resolution of run1
+    resolveFirstQuery({ Status: 3 })
+    await run1
+
+    // run1's late results must NOT overwrite or pollute run2
+    expect(domainsResults.value.domains.map(d => d.domain)).toEqual(['fast.org'])
+    expect(loading.value).toBe(false)
+  })
 })
