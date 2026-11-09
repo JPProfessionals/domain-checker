@@ -28,7 +28,7 @@
     "@nuxtjs/seo": "5.1.3",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
-    "nuxt": "^4.6.2",
+    "nuxt": "^4.6.3",
     "nuxt-security": "^2.6.0",
     "zod": "^4.6.6"
   },
@@ -81,7 +81,8 @@
       "vue-i18n": ">=11.4.14 <12",
       "@intlify/core": ">=11.4.14 <12",
       "@intlify/core-base": ">=11.4.14 <12",
-      "@intlify/shared": ">=11.4.14 <12"
+      "@intlify/shared": ">=11.4.14 <12",
+      "node-forge": ">=1.4.3"
     }
   }
 }
