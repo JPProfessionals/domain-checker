@@ -48,7 +48,7 @@
   "pnpm": {
     "overrides": {
       "tar": ">=7.5.21",
-      "fast-xml-parser": ">=5.5.7",
+      "fast-xml-parser": ">=5.12.1",
       "lodash": ">=4.17.23",
       "simple-git": ">=3.28.0 <4",
       "rollup": ">=4.40.0",
@@ -83,7 +83,8 @@
       "@intlify/core-base": ">=11.4.14 <12",
       "@intlify/shared": ">=11.4.14 <12",
       "node-forge": ">=1.4.3",
-      "glob@^13.0.0": "^14.0.4"
+      "glob@^13.0.0": "^14.0.4",
+      "@nuxt/schema@<4.6.4": "4.6.4"
     }
   }
 }
